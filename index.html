@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Problemes del dia a dia</title>
+<title>Pensa i resol!</title>
 <style>
 @font-face{font-family:"Comic Neue";src:url("https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/files/comic-neue-latin-400-normal.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
 @font-face{font-family:"Comic Neue";src:url("https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/files/comic-neue-latin-700-normal.woff2") format("woff2");font-style:normal;font-weight:700;font-display:swap}
@@ -76,7 +76,7 @@ dialog p,#gameover p{margin-top:0}#gameover{padding:14px;background:#f3eee2;bord
 </style>
 </head>
 <body>
-<header><div><h1>Problemes del dia a dia</h1><p>Tria l’operació i després escriu el resultat.</p></div></header>
+<header><div><h1>Pensa i resol!</h1><p>Tria l’operació i després escriu el resultat.</p></div></header>
 <main>
 <aside aria-label="Opcions del joc">
 <fieldset class="levels"><legend>Dificultat</legend>
@@ -140,7 +140,7 @@ dialog p,#gameover p{margin-top:0}#gameover{padding:14px;background:#f3eee2;bord
 </form>
 <div id="sheet-actions" class="row" hidden>
 <a id="sheet-open" class="sheet-action" target="_blank" rel="noopener">Obre el PDF</a>
-<a id="sheet-save" class="sheet-action" download="Problemes_del_dia_a_dia.pdf">Desa el PDF</a>
+<a id="sheet-save" class="sheet-action" download="Pensa_i_resol.pdf">Desa el PDF</a>
 </div>
 </dialog>
 <script>
@@ -239,12 +239,12 @@ const templates = {
   multiply: [
     (n,o,p,b) => [`A ${p} han preparat ${n[0]} ${b}. Hi han posat la mateixa quantitat a tot arreu. Cada ${container[b]} té ${quantityOf(n[1],o)}.`, 'Quants n’hi ha en total?'],
     (n,o,p) => [`A ${p} preparen una activitat i fan ${n[0]} grups. Quan tot està a punt, cada grup rep ${quantityOf(n[1],o)}.`, 'Quants se’n reparteixen en total?'],
-    (n,o) => [`Per preparar una activitat, durant ${n[0]} dies fan una recollida de ${o}. Cada dia en porten ${n[1]}.`, 'Quants n’han portat en total?']
+    (n,o) => [`Per preparar una activitat, durant ${n[0]} dies fan una recollida per reunir ${o}. Cada dia en porten ${n[1]}.`, 'Quants n’han portat en total?']
   ],
   divide: [
-    (n,o,p,b,g) => [`Has preparat ${quantityOf(n[0],o)} per repartir entre ${n[1]} ${g}. Vols que tothom en rebi la mateixa quantitat.`, `Quants en rep cada ${recipient[g]}?`],
+    (n,o,p,b,g) => [`Has preparat ${quantityOf(n[0],o)}${o === 'mitjons' ? ' solts' : ''} per repartir entre ${n[1]} ${g}. Vols que tothom en rebi la mateixa quantitat.`, `Quants en rep cada ${recipient[g]}?`],
     (n,o) => [`A l’hora de recollir, tens ${quantityOf(n[0],o)} per guardar. Treus unes bosses i en poses ${n[1]} a cada bossa.`, 'Quantes bosses omples?'],
-    (n,o) => [`En acabar l’activitat, ${n[1]} persones s’han de repartir ${quantityOf(n[0],o)}. Acorden que tothom en rebrà la mateixa quantitat.`, 'Quants en rep cada persona?']
+    (n,o) => [`En acabar l’activitat, ${n[1]} persones s’han de repartir ${quantityOf(n[0],o)}${o === 'mitjons' ? ' solts' : ''}. Acorden que tothom en rebrà la mateixa quantitat.`, 'Quants en rep cada persona?']
   ],
   divideAdd: [
     (n,o) => [`Els grups ja són a punt per començar. Reparteixes ${quantityOf(n[0],o)} a parts iguals entre ${n[1]} grups. Quan arriba una altra capsa, dones ${n[2]} més a cada grup.`, 'Quants en té cada grup al final?']
@@ -341,8 +341,8 @@ const durations = [
 const minutes = amount => amount + (amount === 1 ? ' minut' : ' minuts');
 
 function clockTimes(kind,level) {
-  const start = randomInt(8,level < 2 ? 12 : 18);
-  const duration = randomInt(1,level < 2 ? 3 : 5);
+  const start = randomInt(8,[12,15,18,18][level]);
+  const duration = randomInt(minChange,[3,4,5,5][level]);
   const end = start + duration;
   return kind === 'add' ? [[start,duration],end] : [[end,start],duration];
 }
@@ -359,11 +359,11 @@ const specialScenes = [
     wording: ([a,b]) => [`${setup}. Al moneder tens ${a} € i en gastes ${b} € per pagar ${item}.`, 'Quants euros et queden?']})),
   ...bills.map(([icon,subject]) => ({icon, group:'💶', kind:'inverse',
     wording: ([a,b]) => [`${subject}. El total és de ${a} € i ja n’has pagat ${b} €.`, 'Quants euros et falten per pagar?']})),
-  ...prices.map(([icon,setup,item]) => ({icon, group:'💶', kind:'multiply', labels:['Preu per unitat'],
+  ...prices.map(([icon,setup,item]) => ({icon, group:'💶', kind:'multiply', values:unitPrice, labels:['Preu per unitat'],
     wording: ([a,b]) => [`${setup}, tries ${a} ${item}. Abans de pagar, mires el cartell de preus i veus que cada unitat costa ${b} €.`, 'Quants euros pagues en total?']})),
   ...timeActivities.flatMap(([icon,setup,activity,startVerb,endVerb]) => [
-    {icon, group:'🕐', kind:'add', values:clockTimes,
-      wording: ([a,b]) => [`${setup}. ${activity} ${startVerb} a les ${a}:00. ${startVerb === 'surt' ? 'El trajecte' : 'L’activitat'} dura ${b} ${b === 1 ? 'hora' : 'hores'}.`, `A quina hora ${endVerb}? Escriu només l’hora.`]},
+    {icon, group:'🕐', kind:'add', values:clockTimes, answerFormat:'hour',
+      wording: ([a,b]) => [`${setup}. ${activity} ${startVerb} a les ${a}:00. ${startVerb === 'surt' ? 'El trajecte' : 'L’activitat'} dura ${b} ${b === 1 ? 'hora' : 'hores'}.`, `A quina hora ${endVerb}? Pots escriure l’hora amb minuts o sense.`]},
     {icon, group:'🕐', kind:'subtract', values:clockTimes,
       wording: ([a,b]) => [`${setup}. ${activity} ${startVerb} a les ${b}:00 i ${endVerb} a les ${a}:00.`, 'Quantes hores dura?']}
   ]),
@@ -377,91 +377,91 @@ const specialScenes = [
 ];
 
 const extraProblemRows = [
-  ["add", "🚌", ["Primera parada", "Segona parada"], "El bus escolar fa dues parades abans d’arribar a l’institut. A la primera hi pugen {a} alumnes i a la segona n’hi pugen {b}.", "Quants alumnes han pujat entre les dues parades?"],
+  ["add", "🚌", ["Primera parada", "Segona parada"], "El bus escolar fa dues parades abans d’arribar a l’institut. A la primera hi pugen {a} {a?alumne:alumnes} i a la segona n’hi pugen {b}.", "Quants alumnes han pujat entre les dues parades?"],
   ["add", "📫", ["Bústia de l’entrada", "Bústia del pati"], "Reculls les cartes del centre. A la bústia de l’entrada n’hi ha {a} i a la del pati n’hi ha {b}.", "Quantes cartes reculls en total?"],
   ["add", "🍓", ["Dilluns", "Dimarts"], "A l’hort escolar, cada dia pesen la collita. Dilluns cullen {a} {a?quilo:quilos} de maduixes i dimarts en cullen {b}.", "Quants quilos de maduixes han collit entre tots dos dies?"],
-  ["add", "🐚", ["Vora l’aigua", "Damunt la sorra"], "Durant una passejada, reculls {a} petxines vora l’aigua. Més endavant en trobes {b} damunt la sorra.", "Quantes petxines has recollit?"],
-  ["add", "🧺", ["Roba blanca", "Roba de color"], "Abans de fer la bugada, separes la roba. Hi ha {a} peces de roba blanca i {b} peces de roba de color.", "Quantes peces hauràs de rentar?"],
-  ["add", "🎟️", ["Comandes per internet", "Taquilla"], "El teatre ven {a} entrades per internet i {b} a la taquilla. Quan tanca, compta totes les vendes.", "Quantes entrades ha venut?"],
-  ["add", "🍞", ["Barres", "Panets"], "Abans d’obrir la fleca, col·loques {a} barres en un prestatge i {b} panets en un altre.", "Quantes peces de pa has col·locat?"],
+  ["add", "🐚", ["Vora l’aigua", "Damunt la sorra"], "Durant una passejada, reculls {a} {a?petxina:petxines} vora l’aigua. Més endavant en trobes {b} damunt la sorra.", "Quantes petxines has recollit?"],
+  ["add", "🧺", ["Roba blanca", "Roba de color"], "Abans de fer la bugada, separes la roba. Hi ha {a} {a?peça:peces} de roba blanca i {b} {b?peça:peces} de roba de color.", "Quantes peces hauràs de rentar?"],
+  ["add", "🎟️", ["Comandes per internet", "Taquilla"], "El teatre ven {a} {a?entrada:entrades} per internet i {b} a la taquilla. Quan tanca, compta totes les vendes.", "Quantes entrades ha venut?"],
+  ["add", "🍞", ["Barres", "Panets"], "Abans d’obrir la fleca, col·loques {a} {a?barra:barres} en un prestatge i {b} {b?panet:panets} en un altre.", "Quantes peces de pa has col·locat?"],
   ["add", "🧦", ["Parells al calaix", "Parells a l’estenedor"], "Busques mitjons per fer la maleta. Trobes {a} {a?parell:parells} al calaix i {b} a l’estenedor.", "Quants parells de mitjons tens a mà?"],
   ["add", "📚", ["Préstecs al matí", "Préstecs a la tarda"], "La biblioteca anota els llibres que deixa en préstec. Al matí en deixa {a} i a la tarda en deixa {b}.", "Quants llibres ha deixat en préstec durant el dia?"],
-  ["add", "🎮", ["Partida de l’Èric", "Partida de la Nora"], "L’Èric i la Nora juguen en equip. L’Èric aporta {a} punts i la Nora n’aporta {b}.", "Quants punts ha fet l’equip?"],
-  ["add", "🐶", ["Gossos grossos", "Gossos petits"], "Al refugi separen els gossos per mida abans de passejar-los. Al pati hi ha {a} gossos grossos i {b} de petits.", "Quants gossos passejaran?"],
+  ["add", "🎮", ["Partida de l’Èric", "Partida de la Nora"], "L’Èric i la Nora juguen en equip. L’Èric aporta {a} {a?punt:punts} i la Nora n’aporta {b}.", "Quants punts ha fet l’equip?"],
+  ["add", "🐶", ["Gossos grossos", "Gossos petits"], "Al refugi es preparen per treure tots els gossos del pati a passejar. Hi ha {a} {a?gos gros:gossos grossos} i {b} {b?de petit:de petits}.", "Quants gossos passejaran?"],
   ["addMany", "🧁", ["Primera safata", "Segona safata", "Tercera safata", "Quarta safata"], "Acabes de treure unes safates de magdalenes del forn. Les quantitats que hi ha a les safates són {list}.", "Quantes magdalenes has fet?"],
   ["addMany", "🚲", ["Carril del parc", "Carril del pont", "Carril de l’escola", "Carril del mercat"], "Per planificar una ruta, anotes quantes bicis hi ha a cada aparcament. Els recomptes, en ordre, són {list}.", "Quantes bicis has comptat en total?"],
   ["addMany", "🥫", ["Primer grup", "Segon grup", "Tercer grup", "Quart grup"], "A l’escola recullen pots d’aliments. Els grups n’han duit aquestes quantitats, en ordre: {list}.", "Quants pots han recollit entre tots?"],
-  ["addMany", "📦", ["Primera entrega", "Segona entrega", "Tercera entrega", "Quarta entrega"], "A la botiga han arribat diverses entregues durant el dia. A cada entrega hi havia aquesta quantitat de paquets, en ordre: {list}.", "Quants paquets han arribat a la botiga?"],
+  ["addMany", "📦", ["Primera entrega", "Segona entrega", "Tercera entrega", "Quarta entrega"], "A la botiga han arribat diverses entregues. Si les ordenes de la primera a l’última, els nombres de paquets són {list}.", "Quants paquets han arribat a la botiga?"],
   ["subtract", "💧", ["Aigua inicial", "Aigua gastada"], "Omples una garrafa amb {a} {a?litre:litres} d’aigua per netejar el pati. Al final de la feina n’has gastat {b}.", "Quants litres queden a la garrafa?"],
-  ["subtract", "🎬", ["Aforament", "Seients ocupats"], "Just abans que comenci la pel·lícula, l’acomodadora revisa la sala. Hi ha {a} seients i {b} estan ocupats.", "Quants seients són buits?"],
-  ["subtract", "🥪", ["Entrepans preparats", "Entrepans venuts"], "El bar prepara {a} entrepans per al descans. Quan acaba el descans, n’ha venut {b}.", "Quants entrepans li queden?"],
-  ["subtract", "🎨", ["Fulls a la carpeta", "Fulls emprats"], "Abans de començar un mural, treus una carpeta amb {a} fulls de colors. Per fer el dibuix n’empres {b}.", "Quants fulls queden a la carpeta?"],
-  ["subtract", "🚌", ["Passatgers a bord", "Passatgers que baixen"], "Quan el bus arriba a la plaça, du {a} passatgers. En aquesta parada en baixen {b} i no hi puja ningú.", "Quants passatgers continuen al bus?"],
-  ["subtract", "🌱", ["Llavors sembrades", "Llavors que han brotat"], "Sembres {a} llavors en una safata. Una setmana després, comptes que n’han brotat {b}.", "Quantes llavors encara no han brotat?"],
-  ["subtract", "🕯️", ["Espelmes de la capsa", "Espelmes enceses"], "Per preparar una festa, obres una capsa amb {a} espelmes. N’encens {b} per decorar el pati.", "Quantes espelmes queden sense encendre?"],
+  ["subtract", "🎬", ["Aforament", "Seients ocupats"], "Just abans que comenci la pel·lícula, l’acomodadora revisa la sala. Hi ha {a} {a?seient:seients}. D’aquests, n’hi ha {b} {b?d’ocupat:d’ocupats}.", "Quants seients són buits?"],
+  ["subtract", "🥪", ["Entrepans preparats", "Entrepans venuts"], "El bar prepara {a} {a?entrepà:entrepans} per al descans. Quan acaba el descans, n’ha venut {b}.", "Quants entrepans li queden?"],
+  ["subtract", "🎨", ["Fulls a la carpeta", "Fulls emprats"], "Abans de començar un mural, treus una carpeta amb {a} {a?full:fulls} de colors. Per fer el dibuix n’empres {b}.", "Quants fulls queden a la carpeta?"],
+  ["subtract", "🚌", ["Passatgers a bord", "Passatgers que baixen"], "Quan el bus arriba a la plaça, du {a} {a?passatger:passatgers}. En aquesta parada en baixen {b} i no hi puja ningú.", "Quants passatgers continuen al bus?"],
+  ["subtract", "🌱", ["Llavors sembrades", "Llavors que han brotat"], "Sembres {a} {a?llavor:llavors} en una safata. Una setmana després, comptes que n’han brotat {b}.", "Quantes llavors encara no han brotat?"],
+  ["subtract", "🕯️", ["Espelmes de la capsa", "Espelmes enceses"], "Per preparar una festa, obres una capsa amb {a} {a?espelma:espelmes}. N’encens {b} per decorar el pati.", "Quantes espelmes queden sense encendre?"],
   ["subtract", "📏", ["Cinta sencera", "Tros tallat"], "Per penjar un cartell, tens una cinta de {a} {a?metre:metres}. En talles un tros de {b} {b?metre:metres}.", "Quants metres de cinta et queden?"],
-  ["subtract", "⚽", ["Gols del primer equip", "Gols del segon equip"], "Dos equips fan un concurs de penals. El primer marca {a} gols i el segon en marca {b}.", "Quants gols més ha marcat el primer equip?"],
-  ["subtract", "🧃", ["Ampolles a la caixa", "Ampolles buides"], "Al final del pícnic, hi ha {a} ampolles de suc a la caixa. D’aquestes, {b} ja són buides.", "Quantes ampolles encara tenen suc?"],
-  ["subtract", "🧩", ["Peces del puzle", "Peces col·locades"], "Comences un puzle que té {a} peces. Abans d’anar a sopar n’has col·locat {b}.", "Quantes peces et falten per col·locar?"],
-  ["subtractMany", "🎫", ["Entrades disponibles", "Entrades de l’escola", "Entrades del casal"], "Per a un concert, queden {a} entrades lliures. L’escola en reserva {b} i el casal en reserva {c}.", "Quantes entrades queden lliures?"],
+  ["subtract", "⚽", ["Gols del primer equip", "Gols del segon equip"], "Dos equips fan un concurs de penals. El primer marca {a} {a?gol:gols} i el segon en marca {b}.", "Quants gols més ha marcat el primer equip?"],
+  ["subtract", "🧃", ["Ampolles a la caixa", "Ampolles buides"], "Al final del pícnic hi ha {a} {a?ampolla:ampolles} a la caixa. D’aquestes, {b} ja són buides.", "Quantes ampolles encara tenen suc?"],
+  ["subtract", "🧩", ["Peces del puzle", "Peces col·locades"], "Comences un puzle que té {a} {a?peça:peces}. Abans d’anar a sopar n’has col·locat {b}.", "Quantes peces et falten per col·locar?"],
+  ["subtractMany", "🎫", ["Entrades disponibles", "Entrades de l’escola", "Entrades del casal"], "Per a un concert, queden {a} {a?entrada lliure:entrades lliures}. L’escola en reserva {b} i el casal en reserva {c}.", "Quantes entrades queden lliures?"],
   ["subtractMany", "🧴", ["Amb aigua", "Per al pati", "Per al jardí"], "Per netejar, omples un poal amb {a} {a?litre:litres} d’aigua. En gastes {b} al pati i {c} al jardí.", "Quants litres d’aigua et queden?"],
-  ["subtractMany", "🍊", ["Collita", "Per a casa", "Per a la veïna"], "Arribes de l’hort amb {a} taronges. En deixes {b} a casa i en dones {c} a la veïna.", "Quantes taronges encara dus al cistell?"],
-  ["subtractMany", "📒", ["Quaderns inicials", "Per a la classe", "Per al taller"], "A la sala de material hi ha {a} quaderns. En duus {b} a una classe i {c} al taller de tarda.", "Quants quaderns queden a la sala?"],
+  ["subtractMany", "🍊", ["Collita", "Per a casa", "Per a la veïna"], "Arribes de l’hort amb {a} {a?taronja:taronges}. En deixes {b} a casa i en dones {c} a la veïna.", "Quantes taronges encara dus al cistell?"],
+  ["subtractMany", "📒", ["Quaderns inicials", "Per a la classe", "Per al taller"], "A la sala de material hi ha {a} {a?quadern:quaderns}. En duus {b} a una classe i {c} al taller de tarda.", "Quants quaderns queden a la sala?"],
   ["inverse", "🎁", ["Preu del regal", "Aportació de la Noa"], "La Noa i en Pau comparteixen el cost d’un regal de {a} €. La Noa hi posa {b} €.", "Quants euros hi ha de posar en Pau?"],
-  ["inverse", "💡", ["Consum del rebut", "Consum de la cuina"], "A casa reviseu el consum del dia. El rebut marca {a} kWh en total i els aparells de la cuina n’han gastat {b}.", "Quants kWh han gastat els altres aparells?"],
-  ["inverse", "🧱", ["Peces necessàries", "Peces aportades"], "Entre tu i la Júlia necessiteu {a} peces per acabar una maqueta. Tu en duus {b}.", "Quantes peces hi ha de dur la Júlia?"],
-  ["inverse", "🥕", ["Hortalisses del cistell", "Pastanagues"], "Omples un cistell amb pastanagues i patates. En total hi poses {a} hortalisses i {b} són pastanagues.", "Quantes patates hi has posat?"],
-  ["inverse", "💶", ["Diners actuals", "Diners del regal"], "Has rebut {b} € d’aniversari i els guardes al moneder. Ara, en comptar-los, hi trobes {a} €.", "Quants euros hi havia abans del regal?"],
-  ["inverse", "📨", ["Cartes totals", "Cartes de la tarda"], "Al final del dia, el carter ha repartit {a} cartes. A la tarda n’ha repartit {b}.", "Quantes cartes havia repartit al matí?"],
+  ["inverse", "💧", ["Aigua de tota la casa", "Aigua de la cuina"], "A casa mesureu quanta aigua gasteu durant el dia. En total heu gastat {a} {a?litre:litres} d’aigua, i a la cuina n’heu gastat {b}.", "Quants litres d’aigua heu gastat a la resta de la casa?"],
+  ["inverse", "🧱", ["Peces necessàries", "Peces aportades"], "Entre tu i la Júlia necessiteu {a} {a?peça:peces} per acabar una maqueta. Tu en duus {b}.", "Quantes peces hi ha de dur la Júlia?"],
+  ["inverse", "🥕", ["Hortalisses del cistell", "Pastanagues"], "Omples un cistell amb pastanagues i patates. En total hi poses {a} {a?hortalissa:hortalisses} i {b} {b?és una pastanaga:són pastanagues}.", "Quantes patates hi has posat?"],
+  ["inverse", "💶", ["Diners actuals", "Diners del regal"], "Has rebut {b} € d’aniversari i els guardes al moneder. Quan comptes tots els diners del moneder, veus que ara hi ha {a} €.", "Quants euros hi havia abans del regal?"],
+  ["inverse", "📨", ["Cartes totals", "Cartes de la tarda"], "Al final del dia, el carter ha repartit {a} {a?carta:cartes}. A la tarda n’ha repartit {b}.", "Quantes cartes havia repartit al matí?"],
   ["inverse", "🥛", ["Llet del matí", "Llet que queda"], "Al matí tenies {a} {a?litre:litres} de llet. Després de preparar el berenar, te’n queden {b}.", "Quants litres de llet has gastat?"],
-  ["inverse", "🎮", ["Total de punts", "Punts de la segona ronda"], "Jugues dues rondes a un joc de taula. Acabes amb {a} punts i saps que a la segona ronda n’has fet {b}.", "Quants punts havies fet a la primera ronda?"],
-  ["multiply", "🚲", ["Lots", "Rodes per lot"], "Una botiga prepara {a} lots per reparar bicicletes. A la capsa de cada lot hi posa {b} rodes de recanvi.", "Quantes rodes de recanvi han de preparar?"],
-  ["multiply", "🌿", ["Safates", "Testos per safata"], "Per dur els testos al viver, prepares {a} safates. Col·loques {b} testos a cada safata.", "Quants testos hi duràs?"],
-  ["multiply", "🎟️", ["Famílies", "Entrades per família"], "Per a la festa de l’escola venen entrades a {a} famílies. Cada família n’ha reservat {b}.", "Quantes entrades han reservat en total?"],
-  ["multiply", "🚐", ["Furgonetes", "Caixes per furgoneta"], "A l’hora de repartir la compra del mercat, surten {a} furgonetes. Cadascuna du {b} caixes.", "Quantes caixes reparteixen?"],
-  ["multiply", "🫙", ["Pots", "Bales per pot"], "Per ordenar la col·lecció, tries {a} pots iguals. Dins cada pot hi poses {b} bales.", "Quantes bales has guardat?"],
-  ["multiply", "🛍️", ["Bosses", "Panets per bossa"], "La fleca prepara {a} bosses per al berenar d’un equip. A cadascuna hi posa {b} panets.", "Quants panets ha preparat?"],
-  ["multiply", "🍴", ["Taules", "Coberts per taula"], "Al menjador han de parar {a} taules. A cada taula hi posen {b} coberts.", "Quants coberts hi posen entre totes les taules?"],
-  ["multiply", "🧁", ["Safates", "Magdalenes per safata"], "Al forn acaben de preparar {a} safates pel berenar. Totes les safates tenen {b} magdalenes.", "Quantes magdalenes hi ha preparades?"],
-  ["multiply", "🧵", ["Polseres", "Peces per polsera"], "Per a la paradeta de l’escola, vols fer {a} polseres. Cada polsera du {b} peces de colors.", "Quantes peces de colors necessites?"],
-  ["multiply", "🚶", ["Dies", "Voltes per dia"], "Per preparar una caminada, entrenes durant {a} dies. Cada dia fas {b} voltes al parc.", "Quantes voltes has fet en total?"],
-  ["multiply", "🧺", ["Cistells", "Pomes per cistell"], "A l’hort preparen {a} cistells per enviar a la botiga. A cada cistell hi posen {b} pomes.", "Quantes pomes envien a la botiga?"],
-  ["multiply", "✉️", ["Sobres", "Adhesius per sobre"], "Per preparar la festa, omples {a} sobres amb adhesius. A cada sobre n’hi poses {b}.", "Quants adhesius necessites?"],
-  ["addTwice", "📕", ["Llibres guardats", "Donació del matí", "Donació de la tarda"], "Per al racó de lectura ja teniu {a} llibres. Al matí us en donen {b} i a la tarda n’arriben {c} més.", "Quants llibres teniu ara?"],
+  ["inverse", "🎮", ["Total de punts", "Punts de la segona ronda"], "Jugues dues rondes a un joc de taula. Acabes amb {a} {a?punt:punts} i saps que a la segona ronda n’has fet {b}.", "Quants punts havies fet a la primera ronda?"],
+  ["multiply", "🚲", ["Lots", "Rodes per lot"], "Una botiga prepara {a} {a?lot:lots} per reparar bicicletes. A la capsa de cada lot hi posa {b} {b?roda:rodes} de recanvi.", "Quantes rodes de recanvi han de preparar?"],
+  ["multiply", "🌿", ["Safates", "Testos per safata"], "Per dur els testos al viver, prepares {a} {a?safata:safates}. Col·loques {b} {b?test:testos} a cada safata.", "Quants testos hi duràs?"],
+  ["multiply", "🎟️", ["Famílies", "Entrades per família"], "Per a la festa de l’escola venen entrades a {a} {a?família:famílies}. Cada família n’ha reservat {b}.", "Quantes entrades han reservat en total?"],
+  ["multiply", "🚐", ["Furgonetes", "Caixes per furgoneta"], "A l’hora de repartir la compra del mercat, surten {a} {a?furgoneta:furgonetes}. Cadascuna du {b} {b?caixa:caixes}.", "Quantes caixes reparteixen?"],
+  ["multiply", "🫙", ["Pots", "Bales per pot"], "Per ordenar la col·lecció, tries {a} {a?pot:pots} iguals. Dins cada pot hi poses {b} {b?bala:bales}.", "Quantes bales has guardat?"],
+  ["multiply", "🛍️", ["Bosses", "Panets per bossa"], "La fleca prepara {a} {a?bossa:bosses} per al berenar d’un equip. A cadascuna hi posa {b} {b?panet:panets}.", "Quants panets ha preparat?"],
+  ["multiply", "🍴", ["Taules", "Coberts per taula"], "Al menjador han de parar {a} {a?taula:taules}. A cada taula hi posen {b} {b?cobert:coberts}.", "Quants coberts hi posen entre totes les taules?"],
+  ["multiply", "🧁", ["Safates", "Magdalenes per safata"], "Al forn acaben de preparar {a} {a?safata:safates} pel berenar. Totes les safates tenen {b} {b?magdalena:magdalenes}.", "Quantes magdalenes hi ha preparades?"],
+  ["multiply", "🧵", ["Polseres", "Peces per polsera"], "Per a la paradeta de l’escola, vols fer {a} {a?polsera:polseres}. Cada polsera du {b} {b?peça:peces} de colors.", "Quantes peces de colors necessites?"],
+  ["multiply", "🚶", ["Dies", "Voltes per dia"], "Per preparar una caminada, entrenes durant {a} {a?dia:dies}. Cada dia fas {b} {b?volta:voltes} al parc.", "Quantes voltes has fet en total?"],
+  ["multiply", "🧺", ["Cistells", "Pomes per cistell"], "A l’hort preparen {a} {a?cistell:cistells} per enviar a la botiga. A cada cistell hi posen {b} {b?poma:pomes}.", "Quantes pomes envien a la botiga?"],
+  ["multiply", "✉️", ["Sobres", "Adhesius per sobre"], "Per preparar la festa, omples {a} {a?sobre:sobres} amb adhesius. A cada sobre n’hi poses {b}.", "Quants adhesius necessites?"],
+  ["addTwice", "📕", ["Llibres guardats", "Donació del matí", "Donació de la tarda"], "Per al racó de lectura ja teniu {a} {a?llibre:llibres}. Al matí us en donen {b} i a la tarda n’arriben {c} més.", "Quants llibres teniu ara?"],
   ["addTwice", "🪙", ["Guardiola", "Diners de la mare", "Diners de l’avi"], "A la guardiola tens {a} €. La mare t’hi ajuda amb {b} € i el teu avi t’hi afegeix {c} € més.", "Quants euros tens ara?"],
-  ["addTwice", "🚌", ["Passatgers a l’inici", "Primera parada", "Segona parada"], "El bus surt amb {a} passatgers. A la primera parada n’hi pugen {b} i a la següent n’hi pugen {c} més. No en baixa ningú.", "Quants passatgers du ara?"],
-  ["addTwice", "🗑️", ["Papers al sac", "Papers de la plaça", "Papers del parc"], "Comences a netejar el carrer amb {a} papers dins el sac. A la plaça en reculls {b} i al parc en reculls {c} més.", "Quants papers hi ha ara al sac?"],
-  ["addTwice", "🍅", ["Tomàquets al cistell", "Primera planta", "Segona planta"], "Ja tens {a} tomàquets al cistell. En culls {b} d’una planta i després en culls {c} d’una altra.", "Quants tomàquets tens al cistell?"],
-  ["addSubtract", "🥪", ["Entrepans preparats", "Entrepans afegits", "Entrepans servits"], "Per al descans prepares {a} entrepans. En fas {b} més quan arriba un altre grup. Després en serveixes {c}.", "Quants entrepans et queden?"],
-  ["addSubtract", "🧩", ["Peces a la caixa", "Peces trobades", "Peces col·locades"], "En una caixa hi ha {a} peces d’un puzle. En trobes {b} més davall la taula i les hi poses. Després en treus {c} per col·locar-les.", "Quantes peces queden a la caixa?"],
+  ["addTwice", "🚌", ["Passatgers a l’inici", "Primera parada", "Segona parada"], "El bus surt amb {a} {a?passatger:passatgers}. A la primera parada n’hi pugen {b} i a la següent n’hi pugen {c} més. No en baixa ningú.", "Quants passatgers du ara?"],
+  ["addTwice", "🗑️", ["Papers al sac", "Papers de la plaça", "Papers del parc"], "Comences a netejar el carrer amb {a} {a?paper:papers} dins el sac. A la plaça en reculls {b} i al parc en reculls {c} més.", "Quants papers hi ha ara al sac?"],
+  ["addTwice", "🍅", ["Tomàquets al cistell", "Primera planta", "Segona planta"], "Ja tens {a} {a?tomàquet:tomàquets} al cistell. En culls {b} d’una planta i després en culls {c} d’una altra.", "Quants tomàquets tens al cistell?"],
+  ["addSubtract", "🥪", ["Entrepans preparats", "Entrepans afegits", "Entrepans servits"], "Per al descans prepares {a} {a?entrepà:entrepans}. En fas {b} més quan arriba un altre grup. Després en serveixes {c}.", "Quants entrepans et queden?"],
+  ["addSubtract", "🧩", ["Peces a la caixa", "Peces trobades", "Peces col·locades"], "En una caixa hi ha {a} {a?peça:peces} d’un puzle. En trobes {b} més davall la taula i les hi poses. Després en treus {c} per col·locar-les.", "Quantes peces queden a la caixa?"],
   ["addSubtract", "💶", ["Diners inicials", "Diners guanyats", "Diners gastats"], "Dius adéu a un amic amb {a} € al moneder. A casa guanyes {b} € ajudant a endreçar i, a la tarda, et gastes {c} €.", "Quants euros tens al final?"],
-  ["addSubtract", "🧤", ["Guants a la caixa", "Guants retornats", "Guants prestats"], "Al magatzem de material queden {a} guants. Un grup en retorna {b} i, més tard, en presten {c} a un altre grup.", "Quants guants hi ha al magatzem?"],
-  ["addSubtract", "🥤", ["Gots nets", "Gots eixugats", "Gots servits"], "Al menjador hi ha {a} gots nets. N’eixugues {b} més i els hi afegeixes. Després en treuen {c} per parar les taules.", "Quants gots nets queden per repartir?"],
-  ["multiplyAdd", "🍋", ["Caixes", "Llimones per caixa", "Llimones soltes"], "Al mercat arriben {a} caixes amb {b} llimones cadascuna. A la parada ja hi havia {c} llimones soltes.", "Quantes llimones hi ha ara a la parada?"],
-  ["multiplyAdd", "🚐", ["Furgonetes", "Caixes per furgoneta", "Caixes al magatzem"], "Arriben {a} furgonetes amb {b} caixes cadascuna. Les descarreguen i les ajunten amb les {c} que ja hi havia al magatzem.", "Quantes caixes hi ha ara al magatzem?"],
-  ["multiplyAdd", "🍪", ["Plats", "Galetes per plat", "Galetes soltes"], "Per al berenar, has preparat {a} plats amb {b} galetes a cada plat. També hi ha {c} galetes soltes en una safata.", "Quantes galetes has preparat?"],
-  ["multiplyAdd", "📚", ["Prestatges", "Llibres per prestatge", "Llibres a taula"], "Endreces {a} prestatges i poses {b} llibres a cadascun. Encara te’n queden {c} damunt la taula.", "Quants llibres tenies per endreçar?"],
-  ["multiplyAdd", "🎮", ["Rondes", "Punts per ronda", "Punts de bonificació"], "En un joc, completes {a} rondes amb {b} punts a cadascuna. Quan acabes, reps {c} punts de bonificació.", "Quants punts has fet?"],
-  ["addThree", "🥫", ["Pots inicials", "Primer grup", "Segon grup", "Tercer grup"], "La recollida d’aliments comença amb {a} pots. Al llarg del dia, tres grups hi aporten {b}, {c} i {d} pots més.", "Quants pots hi ha quan acaba la recollida?"],
-  ["addThree", "🐚", ["Petxines inicials", "Vora l’aigua", "A les roques", "A la sortida"], "Arribes a la platja amb {a} petxines al poal. En trobes {b} vora l’aigua, {c} a les roques i {d} a la sortida.", "Quantes petxines dus quan te’n vas?"],
-  ["addThree", "🧮", ["Punts d’inici", "Primera prova", "Segona prova", "Tercera prova"], "Un equip comença el concurs amb {a} punts. A les tres proves següents n’aconsegueix {b}, {c} i {d}, per aquest ordre.", "Quants punts té en acabar?"],
-  ["addThree", "🍎", ["Pomes d’inici", "Primera família", "Segona família", "Tercera família"], "Per fer suc, tens {a} pomes al rebost. Tres famílies te’n porten més: {b} la primera, {c} la segona i {d} la tercera.", "Quantes pomes pots fer servir?"],
+  ["addSubtract", "🧤", ["Guants a la caixa", "Guants retornats", "Guants prestats"], "Al magatzem de material queden {a} {a?guant:guants}. Un grup en retorna {b} i, més tard, en presten {c} a un altre grup.", "Quants guants hi ha al magatzem?"],
+  ["addSubtract", "🥤", ["Gots nets", "Gots eixugats", "Gots servits"], "Al menjador hi ha {a} {a?got:gots} nets. N’eixugues {b} més i els hi afegeixes. Després en treuen {c} per parar les taules.", "Quants gots nets queden per repartir?"],
+  ["multiplyAdd", "🍋", ["Caixes", "Llimones per caixa", "Llimones soltes"], "Al mercat arriben {a} {a?caixa:caixes} amb {b} {b?llimona:llimones} cadascuna. A la parada ja hi havia {c} {c?llimona solta:llimones soltes}.", "Quantes llimones hi ha ara a la parada?"],
+  ["multiplyAdd", "🚐", ["Furgonetes", "Caixes per furgoneta", "Caixes al magatzem"], "Arriben {a} {a?furgoneta:furgonetes} amb {b} {b?caixa:caixes} cadascuna. Les descarreguen i les ajunten amb les {c} que ja hi havia al magatzem.", "Quantes caixes hi ha ara al magatzem?"],
+  ["multiplyAdd", "🍪", ["Plats", "Galetes per plat", "Galetes soltes"], "Per al berenar, has preparat {a} {a?plat:plats} amb {b} {b?galeta:galetes} a cada plat. També hi ha {c} {c?galeta:galetes} soltes en una safata.", "Quantes galetes has preparat?"],
+  ["multiplyAdd", "📚", ["Prestatges", "Llibres per prestatge", "Llibres a taula"], "Endreces {a} {a?prestatge:prestatges} i poses {b} {b?llibre:llibres} a cadascun. Encara te’n queden {c} damunt la taula.", "Quants llibres tenies per endreçar?"],
+  ["multiplyAdd", "🎮", ["Rondes", "Punts per ronda", "Punts de bonificació"], "En un joc, completes {a} {a?ronda:rondes} amb {b} {b?punt:punts} a cadascuna. Quan acabes, reps {c} {c?punt:punts} de bonificació.", "Quants punts has fet?"],
+  ["addThree", "🥫", ["Pots inicials", "Primer grup", "Segon grup", "Tercer grup"], "La recollida d’aliments comença amb {a} {a?pot:pots}. El primer grup hi aporta {b} més, el segon hi aporta {c} i el tercer, {d}.", "Quants pots hi ha quan acaba la recollida?"],
+  ["addThree", "🐚", ["Petxines inicials", "Vora l’aigua", "A les roques", "A la sortida"], "Arribes a la platja amb {a} {a?petxina:petxines} al poal. En trobes {b} vora l’aigua, {c} a les roques i {d} a la sortida.", "Quantes petxines dus quan te’n vas?"],
+  ["addThree", "🧮", ["Punts d’inici", "Primera prova", "Segona prova", "Tercera prova"], "Un equip comença el concurs amb {a} {a?punt:punts}. A les tres proves següents n’aconsegueix {b}, {c} i {d}, per aquest ordre.", "Quants punts té en acabar?"],
+  ["addThree", "🍎", ["Pomes d’inici", "Primera família", "Segona família", "Tercera família"], "Per fer suc, tens {a} {a?poma:pomes} al rebost. Tres famílies te’n porten més: {b} la primera, {c} la segona i {d} la tercera.", "Quantes pomes pots fer servir?"],
   ["addThree", "🪙", ["Estalvis", "Primera aportació", "Segona aportació", "Tercera aportació"], "Vols estalviar per a una excursió i comences amb {a} €. En tres dies hi afegeixes {b} €, {c} € i {d} €.", "Quants euros tens estalviats després dels tres dies?"],
-  ["addSubtractAdd", "🚌", ["Passatgers inicials", "Pugen a la plaça", "Baixen al mercat", "Pugen al parc"], "El bus surt amb {a} passatgers. A la plaça en pugen {b}, al mercat en baixen {c} i al parc en pugen {d}.", "Quants passatgers hi ha després de la parada del parc?"],
-  ["addSubtractAdd", "🎟️", ["Entrades inicials", "Entrades afegides", "Entrades venudes", "Reserves cancel·lades"], "A taquilla queden {a} entrades. El teatre n’hi afegeix {b}, en ven {c} i, quan es cancel·len unes reserves, hi tornen {d} entrades.", "Quantes entrades queden disponibles?"],
-  ["addSubtractAdd", "🧺", ["Roba al cistell", "Roba afegida", "Roba rentada", "Roba afegida al vespre"], "Tens {a} peces al cistell de la bugada. N’hi poses {b} més i en rentes {c}. Al vespre n’hi deixes {d} més.", "Quantes peces queden per rentar?"],
-  ["addSubtractAdd", "🎨", ["Pinzells d’inici", "Compra", "Pinzells retirats", "Préstec"], "Al taller hi ha {a} pinzells. En compres {b}, en retires {c} de fets malbé i una altra classe te’n deixa {d} més.", "Amb quants pinzells pots treballar?"],
-  ["addSubtractAdd", "🥖", ["Pa inicial", "Primera fornada", "Vendes", "Segona fornada"], "A primera hora la fleca té {a} peces de pa. En treu {b} del forn, en ven {c} i després en cou {d} més.", "Quantes peces de pa hi ha ara?"],
-  ["multiplyAddSubtract", "🧃", ["Caixes", "Sucs per caixa", "Sucs solts", "Sucs beguts"], "Per a la festa obres {a} caixes amb {b} sucs cadascuna. Hi afegeixes {c} sucs solts i, durant la festa, se’n beuen {d}.", "Quants sucs queden?"],
-  ["multiplyAddSubtract", "🖍️", ["Estoigs", "Ceres per estoig", "Ceres afegides", "Ceres prestades"], "Per preparar la classe, treus {a} estoigs amb {b} ceres cadascun. Hi afegeixes {c} ceres del calaix i en deixes {d} en préstec.", "Quantes ceres et queden?"],
-  ["multiplyAddSubtract", "🌷", ["Gerros", "Flors per gerro", "Flors noves", "Flors retirades"], "Per decorar la sala omples {a} gerros amb {b} flors cadascun. Després hi afegeixes {c} flors i en retires {d} de marcides.", "Quantes flors queden per decorar la sala?"],
-  ["multiplyAddSubtract", "⚽", ["Equips", "Pilotes per equip", "Pilotes afegides", "Pilotes retirades"], "Al gimnàs, {a} equips duen {b} pilotes cadascun. El professor n’hi afegeix {c} del magatzem i en retira {d} de desinflades.", "Quantes pilotes es poden fer servir?"],
-  ["multiplyAddSubtract", "📦", ["Capses", "Peces per capsa", "Peces soltes", "Peces emprades"], "Per fer una maqueta, obres {a} capses amb {b} peces cadascuna. Hi afegeixes {c} peces soltes i n’empres {d}.", "Quantes peces et queden?"],
-  ["divide", "🥕", ["Pastanagues", "Conills"], "Al refugi prepares {a} pastanagues per a {b} conills. N’hi vols donar la mateixa quantitat a cadascun.", "Quantes pastanagues rep cada conill?"],
-  ["divide", "💶", ["Import", "Amics"], "Després d’una sortida, {b} amics han de pagar una despesa de {a} €. Tots hi posen la mateixa quantitat.", "Quants euros paga cadascú?"],
-  ["divide", "📘", ["Pàgines", "Dies"], "T’has compromès a llegir {a} pàgines en {b} dies. Faràs la mateixa quantitat de lectura cada dia.", "Quantes pàgines hauràs de llegir cada dia?"],
-  ["divide", "🧃", ["Sucs", "Sucs per safata"], "Per dur {a} sucs al pati, en poses {b} a cada safata i no n’ha de sobrar cap.", "Quantes safates necessites?"],
-  ["divide", "🌼", ["Flors", "Gerros"], "A la floristeria prepares {a} flors i {b} gerros. Vols posar-hi el mateix nombre de flors a cadascun.", "Quantes flors posaràs a cada gerro?"]
+  ["addSubtractAdd", "🚌", ["Passatgers inicials", "Pugen a la plaça", "Baixen al mercat", "Pugen al parc"], "El bus surt amb {a} {a?passatger:passatgers}. A la plaça en pugen {b}, al mercat en baixen {c} i al parc en pugen {d}.", "Quants passatgers hi ha després de la parada del parc?"],
+  ["addSubtractAdd", "🎟️", ["Entrades inicials", "Entrades afegides", "Entrades venudes", "Reserves cancel·lades"], "A taquilla queden {a} {a?entrada:entrades}. El teatre n’hi afegeix {b} i en ven {c}. Després es cancel·len {d} reserves que ja estaven fetes i aquestes entrades es tornen a posar a la venda.", "Quantes entrades queden disponibles?"],
+  ["addSubtractAdd", "🧺", ["Roba al cistell", "Roba afegida", "Roba rentada", "Roba afegida al vespre"], "Tens {a} {a?peça:peces} al cistell de la bugada. N’hi poses {b} més i en rentes {c}. Al vespre n’hi deixes {d} més.", "Quantes peces queden per rentar?"],
+  ["addSubtractAdd", "🎨", ["Pinzells d’inici", "Compra", "Pinzells retirats", "Préstec"], "Al taller hi ha {a} {a?pinzell:pinzells}. En compres {b}, en retires {c} de fets malbé i una altra classe te’n deixa {d} més.", "Amb quants pinzells pots treballar?"],
+  ["addSubtractAdd", "🥖", ["Pa inicial", "Primera fornada", "Vendes", "Segona fornada"], "A primera hora la fleca té {a} {a?peça:peces} de pa. En treu {b} del forn, en ven {c} i després en cou {d} més.", "Quantes peces de pa hi ha ara?"],
+  ["multiplyAddSubtract", "🧃", ["Caixes", "Sucs per caixa", "Sucs solts", "Sucs beguts"], "Per a la festa obres {a} {a?caixa:caixes} amb {b} {b?suc:sucs} cadascuna. Hi afegeixes {c} {c?suc solt:sucs solts} i, durant la festa, se’n beuen {d}.", "Quants sucs queden?"],
+  ["multiplyAddSubtract", "🖍️", ["Estoigs", "Ceres per estoig", "Ceres afegides", "Ceres prestades"], "Per preparar la classe, treus {a} {a?estoig:estoigs} amb {b} {b?cera:ceres} cadascun. Hi afegeixes {c} {c?cera:ceres} del calaix i en deixes {d} en préstec.", "Quantes ceres et queden?"],
+  ["multiplyAddSubtract", "🌷", ["Gerros", "Flors per gerro", "Flors noves", "Flors retirades"], "Per decorar la sala omples {a} {a?gerro:gerros} amb {b} {b?flor:flors} cadascun. Després hi afegeixes {c} {c?flor:flors} i en retires {d} de marcides.", "Quantes flors queden per decorar la sala?"],
+  ["multiplyAddSubtract", "⚽", ["Equips", "Pilotes per equip", "Pilotes afegides", "Pilotes retirades"], "Al gimnàs, {a} {a?equip:equips} duen {b} {b?pilota:pilotes} cadascun. El professor n’hi afegeix {c} del magatzem i en retira {d} de desinflades.", "Quantes pilotes es poden fer servir?"],
+  ["multiplyAddSubtract", "📦", ["Capses", "Peces per capsa", "Peces soltes", "Peces emprades"], "Per fer una maqueta, obres {a} {a?capsa:capses} amb {b} {b?peça:peces} cadascuna. Hi afegeixes {c} {c?peça solta:peces soltes} i n’empres {d}.", "Quantes peces et queden?"],
+  ["divide", "🥕", ["Pastanagues", "Conills"], "Al refugi prepares {a} {a?pastanaga:pastanagues} per a {b} {b?conill:conills}. N’hi vols donar la mateixa quantitat a cadascun.", "Quantes pastanagues rep cada conill?"],
+  ["divide", "💶", ["Import", "Amics"], "Després d’una sortida, {b} {b?amic:amics} han de pagar una despesa de {a} €. Tots hi posen la mateixa quantitat.", "Quants euros paga cadascú?"],
+  ["divide", "📘", ["Pàgines", "Dies"], "T’has compromès a llegir {a} {a?pàgina:pàgines} en {b} {b?dia:dies}. Faràs la mateixa quantitat de lectura cada dia.", "Quantes pàgines hauràs de llegir cada dia?"],
+  ["divide", "🧃", ["Sucs", "Sucs per safata"], "Per dur {a} {a?suc:sucs} al pati, en poses {b} a cada safata i no n’ha de sobrar cap.", "Quantes safates necessites?"],
+  ["divide", "🌼", ["Flors", "Gerros"], "A la floristeria prepares {a} {a?flor:flors} i {b} {b?gerro:gerros}. Vols posar-hi el mateix nombre de flors a cadascun.", "Quantes flors posaràs a cada gerro?"]
 ];
 const valueIndex = {a:0,b:1,c:2,d:3};
 
@@ -480,7 +480,7 @@ const extraScenes = extraProblemRows.map(([kind,icon,labels,story,question],inde
 specialScenes.push(...extraScenes);
 
 const stepsByKind = {
-  inverse:['subtract'], add:['add'], addMany:['add'], subtract:['subtract'], subtractMany:['subtract'],
+  inverse:['subtract'], add:['add'], addMany:['add'], subtract:['subtract'], subtractMany:['subtract','subtract'],
   multiply:['multiply'], divide:['divide'], addTwice:['add','add'],
   addSubtract:['add','subtract'], multiplyAdd:['multiply','add'],
   addThree:['add','add','add'], addSubtractAdd:['add','subtract','add'],
@@ -490,7 +490,7 @@ const stepsByKind = {
 const operationNames = {add:'Suma',subtract:'Resta',multiply:'Multiplicació',divide:'Divisió'};
 const levels = [
   {name:'Normals',cap:15,maxFactor:10,drawings:true,points:1},
-  {name:'Difícils',cap:15,maxFactor:10,drawings:false,points:2},
+  {name:'Difícils',cap:30,maxFactor:15,drawings:true,points:2},
   {name:'Impossible',cap:50,maxFactor:50,drawings:false,points:2},
   {name:'Master Mode',cap:100,maxFactor:99,drawings:false,points:3}
 ];
@@ -503,10 +503,12 @@ const randomInt = (min,max) => min + Math.floor(Math.random() * (max-min+1));
 const list = numbers => new Intl.ListFormat('ca').format(numbers.map(String));
 const sum = numbers => numbers.reduce((total,n) => total+n,0);
 
-function splitTotal(total, count) {
+const minChange = 3;
+
+function splitTotal(total, count, minimum = minChange) {
   const parts = [];
   for (let remaining = count; remaining > 1; remaining--) {
-    const part = randomInt(1,total-remaining+1);
+    const part = randomInt(minimum,total-minimum*(remaining-1));
     parts.push(part);
     total -= part;
   }
@@ -524,15 +526,30 @@ function divisionFactors(dividendCap,level) {
   const quotient = randomInt(1,Math.floor(dividendCap/divisor));
   return [quotient,divisor];
 }
-function quantities(kind, level) {
+function unitPrice(kind,level) {
+  const [count] = multiplicationFactors(level);
+  const price = randomInt(1, [3,4,5,9][level]);
+  return [[count,price],count*price];
+}
+
+function quantities(kind, level, choice) {
   const {cap} = levels[level];
   if (kind === 'add' || kind === 'addMany' || kind === 'addTwice' || kind === 'addThree') {
     const count = kind === 'add' ? 2 : kind === 'addTwice' ? 3 : kind === 'addThree' ? 4 : randomInt(3,4);
-    const numbers = splitTotal(randomInt(count,cap),count);
+    const distinctOffsets = kind === 'addThree' ? 3 : 0;
+    const numbers = splitTotal(randomInt(count*minChange+distinctOffsets,cap)-distinctOffsets,count);
+    if (distinctOffsets) {
+      const contributions = numbers.slice(1).sort((a,b)=>a-b).map((n,i)=>n+i);
+      for (let i = contributions.length-1; i > 0; i--) {
+        const j = randomInt(0,i);
+        [contributions[i],contributions[j]] = [contributions[j],contributions[i]];
+      }
+      numbers.splice(1,contributions.length,...contributions);
+    }
     return [numbers,sum(numbers)];
   }
   if (kind === 'subtract' || kind === 'subtractMany' || kind === 'inverse') {
-    const removed = kind !== 'subtractMany' ? [randomInt(1,cap-1)] : splitTotal(randomInt(2,cap-1),2);
+    const removed = kind !== 'subtractMany' ? [randomInt(minChange,cap-1)] : splitTotal(randomInt(2*minChange,cap-1),2);
     const initial = randomInt(sum(removed)+1,cap);
     return [[initial,...removed],initial-sum(removed)];
   }
@@ -545,29 +562,31 @@ function quantities(kind, level) {
     return [[a*b,b],a];
   }
   if (kind === 'divideAdd' || kind === 'subtractDivide') {
-    const [a,b] = divisionFactors(cap-1,level);
+    const [a,b] = divisionFactors(cap-minChange,level);
     if (kind === 'divideAdd') {
-      const extra = randomInt(1,cap-a);
+      const extra = randomInt(minChange,cap-a);
       return [[a*b,b,extra],a+extra];
     }
-    const kept = randomInt(1,cap-a*b);
+    const kept = randomInt(minChange,cap-a*b);
     return [[a*b+kept,kept,b],a];
   }
   if (kind === 'addSubtractAdd') {
-    const [a,b,d] = splitTotal(randomInt(4,cap),3);
-    const c = randomInt(1,a+b);
+    const [a,b,extra] = splitTotal(randomInt(3*minChange,cap),3);
+    const returnsBorrowedItems = !choice?.scene && choice?.templateIndex === 0;
+    const d = returnsBorrowedItems ? Math.min(extra,a+b) : extra;
+    const c = randomInt(returnsBorrowedItems ? d : minChange,a+b);
     return [[a,b,c,d],a+b-c+d];
   }
   if (kind === 'addSubtract') {
-    const [a,b] = splitTotal(randomInt(3,cap),2);
-    const c = randomInt(1,a+b);
+    const [a,b] = splitTotal(randomInt(2*minChange,cap),2);
+    const c = randomInt(minChange,a+b);
     return [[a,b,c],a+b-c];
   }
-  const [a,b] = multiplicationFactors(level,level === 3 ? Infinity : cap-1);
-  const c = randomInt(1,level === 3 ? cap : cap-a*b);
+  const [a,b] = multiplicationFactors(level,level === 3 ? Infinity : cap-minChange);
+  const c = randomInt(minChange,level === 3 ? cap : cap-a*b);
   const total = a*b+c;
   if (kind === 'multiplyAddSubtract') {
-    const d = randomInt(1,Math.min(cap,total));
+    const d = randomInt(minChange,Math.min(cap,total));
     return [[a,b,c,d],total-d];
   }
   return [[a,b,c],total];
@@ -812,15 +831,20 @@ function presentQuestion(question,presentation) {
   return lead+' '+indirect[0].toLocaleLowerCase('ca')+indirect.slice(1);
 }
 
+function parseAnswer(value,format) {
+  const match = (format === 'hour' ? /^(\d{1,2})(?::00)?$/ : /^(\d+)$/).exec(value.trim());
+  return match ? Number(match[1]) : null;
+}
+
 function buildProblem(choice,level,presentation = randomInt(0,2)) {
   const {kind,templateIndex,contextIndex,scene} = choice;
   const [icon,...context] = scene ? [scene.icon] : contexts[contextIndex];
-  const [numbers,answer] = (scene?.values ?? quantities)(kind,level);
+  const [numbers,answer] = (scene?.values ?? quantities)(kind,level,choice);
   const [rawStory,rawQuestion] = scene ? scene.wording(numbers) : templates[kind][templateIndex](numbers,...context);
-  const story = rawStory.replace(/\ba el (?=\p{L})/giu, match => match.startsWith('A') ? 'Al ' : 'al ');
+  const story = rawStory.replace(/(?<![\p{L}’'])a el (?=\p{L})/giu, match => match.startsWith('A') ? 'Al ' : 'al ');
   const naturalQuestion = feminine.has(context[0]) ? rawQuestion.replace(/^Quants/, 'Quantes') : rawQuestion;
   const question = presentQuestion(naturalQuestion,presentation);
-  return {kind,templateIndex,scene,icon,numbers,answer,story,question,presentation,recipients:context[3],context,level,steps:stepsByKind[kind]};
+  return {kind,templateIndex,scene,icon,numbers,answer,answerFormat:scene?.answerFormat,story,question,presentation,recipients:context[3],context,level,steps:stepsByKind[kind]};
 }
 
 function drawGroups(problem,target) {
@@ -852,6 +876,8 @@ function showProblem(focus = false) {
   get('question').textContent = current.question;
   get('progress').textContent = 'Problema '+problemNumber;
   get('answer').value = '';
+  get('answer').inputMode = current.answerFormat === 'hour' ? 'text' : 'numeric';
+  get('answer').maxLength = current.answerFormat === 'hour' ? 5 : 4;
   get('answer').readOnly = false;
   get('check').hidden = false;
   get('skip').hidden = false;
@@ -933,14 +959,14 @@ get('form').addEventListener('submit',event => {
   event.preventDefault();
   if (!lives || solved || feedbackWindow.open || stepIndex !== current.steps.length) return;
   const field = get('answer');
-  const value = field.value.trim();
-  if (!/^\d+$/.test(value)) {
+  const value = parseAnswer(field.value,current.answerFormat);
+  if (value === null) {
     get('feedback').dataset.kind = 'error';
-    get('feedback').textContent = 'Escriu la resposta amb xifres.';
+    get('feedback').textContent = current.answerFormat === 'hour' ? 'Escriu una hora, per exemple 13 o 13:00.' : 'Escriu la resposta amb xifres.';
     field.focus();
     return;
   }
-  if (Number(value) !== current.answer) {
+  if (value !== current.answer) {
     reportMistake('Aquest resultat no és correcte. Perds una vida.',() => {
       field.focus();
       field.select();
@@ -1081,7 +1107,7 @@ async function renderWorksheetPage(problems,options,pageIndex,pageCount) {
   ctx.fillRect(0,0,pageWidth,pageHeight);
   ctx.fillStyle = '#192d32';
   ctx.font = 'bold 24px ' + worksheetFont;
-  ctx.fillText('Problemes del dia a dia',34,45);
+  ctx.fillText('Pensa i resol!',34,45);
   ctx.font = '12px ' + worksheetFont;
   ctx.fillText('Nom _____________________________    Data ____________',35,69);
   ctx.fillText(levels[options.level].name + '  ·  ' + (pageIndex+1) + '/' + pageCount,35,88);
