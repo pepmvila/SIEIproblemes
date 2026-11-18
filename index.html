@@ -191,7 +191,8 @@ dialog p{margin-top:0}
 <form id="sheet-form">
 <h2 id="sheet-title">Fitxa de problemes</h2>
 <label for="sheet-count">Quants problemes vols?</label>
-<input id="sheet-count" type="number" min="1" required aria-describedby="sheet-info">
+<input id="sheet-count" type="number" min="1" required aria-describedby="sheet-limit sheet-info">
+<p id="sheet-limit"><strong>Màxim de 60 problemes per PDF.</strong></p>
 <p id="sheet-info" aria-live="polite"></p>
 <p id="sheet-error" role="status" hidden></p>
 <div class="row"><button id="sheet-download" type="submit" class="primary">Prepara el PDF</button><button id="sheet-close" type="button">Cancel·la</button></div>
@@ -943,11 +944,65 @@ function drawScene(scene,numbers,target = get('picture')) {
     quantityCard(scene.group,count,labels[index] ?? (scene.group === '💶' ? 'Preu' : 'Temps'))));
 }
 
+const presentationCount = 5;
+const lastPresentation = new Map();
+const storyPhrases = [
+  [],
+  [
+    ['A l’inici del dia','A primera hora'], ['Durant el dia','Al llarg del dia'],
+    ['Més tard','Al cap d’una estona'], ['a parts iguals','en quantitats iguals'],
+    ['a cadascuna','a cada una'], ['a cadascun','a cada un'],
+    ['per internet','en línia'], ['mires','comproves'], ['n’has gastat','n’has fet servir']
+  ],
+  [
+    ['A primera hora','Al començament del dia'], ['Ara','En aquest moment'],
+    ['Més tard','Després'], ['Al final del dia','Quan s’acaba el dia'],
+    ['a parts iguals','en quantitats iguals'], ['a cadascuna','a cada una'],
+    ['durant el dia','al llarg del dia'], ['el mateix dia','aquell mateix dia']
+  ],
+  [
+    ['A l’inici del dia','Quan comença el dia'], ['Just abans que','Poc abans que'],
+    ['Més endavant','Una mica més enllà'], ['Més tard','Passada una estona'],
+    ['a parts iguals','en quantitats iguals'], ['a cadascuna','a cada una'],
+    ['del mateix dia','d’aquell mateix dia'], ['al cap d’una estona','una estona després']
+  ],
+  [
+    ['A primera hora','A l’inici del matí'], ['Quan acaba','En acabar'],
+    ['Quan s’acaba el dia','Al final del dia'], ['Al llarg del dia','Durant el dia'],
+    ['Més tard','A continuació'], ['a parts iguals','en quantitats iguals'],
+    ['Acabes de treure','Has tret'], ['Vols saber','T’agradaria saber']
+  ]
+];
+
+function varyStory(story,presentation) {
+  if (presentation === 3) {
+    // A time marker can move within its own sentence without reordering events.
+    story = story.replace(/^(Al matí|A la tarda|Al vespre|A primera hora), ([^.!?]+)([.!?])/,
+      (_,time,clause,end) => clause[0].toLocaleUpperCase('ca')+clause.slice(1)+' '+time.toLocaleLowerCase('ca')+end);
+  }
+  return storyPhrases[presentation].reduce((text,[from,to]) => text.replace(from,to),story);
+}
+
 function presentQuestion(question,presentation) {
   if (presentation === 0) return question;
-  const indirect = question.replace(/\?/,'.');
-  const lead = presentation === 1 ? 'Calcula' : 'Escriu';
-  return lead+' '+indirect[0].toLocaleLowerCase('ca')+indirect.slice(1);
+  const [first,...rest] = question.split('?');
+  const indirect = first[0].toLocaleLowerCase('ca')+first.slice(1);
+  const body = [
+    '',
+    'Calcula '+indirect+'.',
+    'Escriu '+indirect+'.',
+    'Esbrina '+indirect+'.',
+    'Pots dir '+indirect+'?'
+  ][presentation];
+  return body+rest.join('?');
+}
+
+function nextPresentation(key) {
+  const previous = lastPresentation.get(key);
+  const choice = randomInt(0,presentationCount-(previous === undefined ? 1 : 2));
+  const selected = previous !== undefined && choice >= previous ? choice+1 : choice;
+  lastPresentation.set(key,selected);
+  return selected;
 }
 
 function parseAnswer(value,format) {
@@ -955,12 +1010,12 @@ function parseAnswer(value,format) {
   return match ? Number(match[1]) : null;
 }
 
-function buildProblem(choice,level,presentation = randomInt(0,2)) {
+function buildProblem(choice,level,presentation = randomInt(0,presentationCount-1)) {
   const {kind,templateIndex,contextIndex,scene} = choice;
   const [icon,...context] = scene ? [scene.icon] : contexts[contextIndex];
   const [numbers,answer] = (scene?.values ?? quantities)(kind,level,choice);
   const [rawStory,rawQuestion] = scene ? scene.wording(numbers) : templates[kind][templateIndex](numbers,...context);
-  const story = rawStory.replace(/(?<![\p{L}’'])a el (?=\p{L})/giu, match => match.startsWith('A') ? 'Al ' : 'al ');
+  const story = varyStory(rawStory.replace(/(?<![\p{L}’'])a el (?=\p{L})/giu, match => match.startsWith('A') ? 'Al ' : 'al '),presentation);
   const naturalQuestion = feminine.has(context[0]) ? rawQuestion.replace(/^Quants/, 'Quantes') : rawQuestion;
   const question = presentQuestion(naturalQuestion,presentation);
   return {kind,templateIndex,scene,icon,numbers,answer,answerFormat:scene?.answerFormat,story,question,presentation,recipients:context[3],context,level,steps:stepsByKind[kind]};
@@ -974,7 +1029,8 @@ function drawGroups(problem,target) {
 
 function showProblem(focus = false) {
   const level = Number(document.querySelector('[name=level]:checked').value);
-  current = buildProblem(chooseTemplate(level,get('division').checked,get('mixed').checked),level);
+  const choice = chooseTemplate(level,get('division').checked,get('mixed').checked);
+  current = buildProblem(choice,level,nextPresentation(choice.key));
   solved = false;
   stepIndex = 0;
   resetOperationButtons();
@@ -1216,6 +1272,7 @@ get('restart').addEventListener('click',() => {
   previousBonusGame = undefined;
   repeatBonus = 0;
   bagBySettings.clear();
+  lastPresentation.clear();
   updateScoreboard();
   showProblem(true);
 });
@@ -1224,6 +1281,8 @@ document.querySelectorAll('aside input').forEach(input => input.addEventListener
   if (solved) problemNumber++;
   showProblem();
 }));
+const maxPdfProblems = 60;
+
 function worksheetOptions() {
   const level = Number(document.querySelector('[name=level]:checked').value);
   const {ordinary,special} = problemChoices(get('division').checked,get('mixed').checked);
@@ -1232,7 +1291,7 @@ function worksheetOptions() {
     if (!byTemplate.has(choice.key)) byTemplate.set(choice.key,[]);
     byTemplate.get(choice.key).push(choice);
   }
-  return {level,perPage:levels[level].drawings ? 3 : 4,templates:[...byTemplate.values()]};
+  return {level,perPage:levels[level].drawings ? 3 : 4,templates:[...byTemplate.values()],maxProblems:Math.min(maxPdfProblems,byTemplate.size)};
 }
 
 function worksheetProblems(options,count) {
@@ -1407,19 +1466,20 @@ function clearSheetActions() {
 }
 function updateSheetInfo() {
   const count = get('sheet-count').valueAsNumber;
-  const {perPage,templates} = sheetOptions;
-  const valid = Number.isInteger(count) && count >= 1 && count <= templates.length;
+  const {perPage,maxProblems} = sheetOptions;
+  const valid = Number.isInteger(count) && count >= 1 && count <= maxProblems;
   const pages = valid ? Math.ceil(count/perPage) : 0;
   const estimate = pages === 1 ? '1 pàgina.' : pages+' pàgines.';
   get('sheet-info').textContent = (valid ? estimate+' ' : '') + perPage+
-    ' problemes per pàgina com a màxim. Pots demanar fins a '+templates.length+' problemes sense repetir plantilla.';
+    ' problemes per pàgina com a màxim.' + (maxProblems < maxPdfProblems ?
+      ' Amb les opcions actuals, pots fer fins a '+maxProblems+' problemes sense repetir plantilla.' : '');
 }
 get('worksheet').addEventListener('click',() => {
   clearSheetActions();
   get('sheet-close').textContent = 'Cancel·la';
   sheetOptions = worksheetOptions();
-  get('sheet-count').max = sheetOptions.templates.length;
-  get('sheet-count').value = Math.min(sheetOptions.templates.length,sheetOptions.perPage*2);
+  get('sheet-count').max = sheetOptions.maxProblems;
+  get('sheet-count').value = Math.min(sheetOptions.maxProblems,sheetOptions.perPage*2);
   get('sheet-error').hidden = true;
   updateSheetInfo();
   get('sheet-dialog').showModal();
@@ -1435,7 +1495,7 @@ get('sheet-form').addEventListener('submit',async event => {
   event.preventDefault();
   const count = get('sheet-count').valueAsNumber;
   const options = sheetOptions;
-  if (sheetUrl || get('sheet-download').disabled || !Number.isInteger(count) || count < 1 || count > options.templates.length) return;
+  if (sheetUrl || get('sheet-download').disabled || !Number.isInteger(count) || count < 1 || count > options.maxProblems) return;
   clearSheetActions();
   get('sheet-count').disabled = true;
   get('sheet-download').disabled = true;
