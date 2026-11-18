@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Problemes del dia a dia</title>
+<style>
+@font-face{font-family:"Comic Neue";src:url("https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/files/comic-neue-latin-400-normal.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:"Comic Neue";src:url("https://cdn.jsdelivr.net/npm/@fontsource/comic-neue@5/files/comic-neue-latin-700-normal.woff2") format("woff2");font-style:normal;font-weight:700;font-display:swap}
+:root{--classroom-font:"Comic Sans MS","Comic Neue","Chalkboard SE","Arial Rounded MT Bold",system-ui,sans-serif;font-family:var(--classroom-font);color:#192d32;background:#f7f2e7;line-height:1.55;--ink:#192d32;--green:#195840;--line:#d5ddd3}
+*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #a74d17;outline-offset:3px}[hidden]{display:none!important}
+header{background:#173d33;color:white;padding:34px 22px 40px}header div,main{max-width:980px;margin:auto}h1{font-size:clamp(1.8rem,5.3vw,3.1rem);line-height:1.08;letter-spacing:-.055em;margin:0 0 10px}header p{margin:0;color:#e0efe2}
+main{padding:25px 18px;display:grid;grid-template-columns:245px minmax(0,1fr);gap:18px;align-items:start}
+aside,article{background:#fffef9;border:1px solid #dbd9cd;border-radius:20px;padding:20px}
+fieldset{padding:0;margin:0;border:0;min-width:0}legend{font-weight:bold;margin-bottom:10px}
+.levels label{display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:9px;border-radius:10px;margin-bottom:7px;cursor:pointer}.levels label:has(:checked){background:#dff1e5;border-color:var(--green);color:#124733}
+.options{padding-top:13px;margin-top:9px;border-top:1px solid var(--line)}.options label{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}
+input[type=checkbox],input[type=radio]{accent-color:var(--green);height:19px;width:19px;flex-shrink:0;margin:0}
+.top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.9rem;font-weight:bold;color:#285341}
+.picture{margin:15px 0 19px;background:#e7f3e9;border-radius:16px;padding:12px;display:flex;flex-wrap:wrap;gap:9px;align-items:stretch}
+.quantity{min-width:82px;background:#fffef9;border:1px solid #adc8b5;border-radius:12px;padding:8px 10px;display:grid;gap:5px;align-content:start}
+.quantity-label{color:#244638;font-size:.87rem;font-weight:bold}
+.objects{display:grid;grid-template-columns:repeat(5,1.48rem);gap:4px;align-items:center;width:max-content}
+.object{font:1.32rem/1.2 system-ui;text-align:center}
+.bundles{display:flex;flex-wrap:wrap;gap:4px;max-width:14rem;margin-bottom:5px}
+.bundle{background:#e7f3e9;border-radius:6px;padding:2px 4px;white-space:nowrap;font-size:.82rem;font-weight:bold}
+#statement.question-first #question{margin:0 0 6px}
+#statement{font-size:clamp(1.08rem,2.6vw,1.33rem);margin:0 0 18px}
+#question{display:block;margin-top:6px}#operation-label{margin:0 0 8px;font-weight:bold}#operations button{min-width:95px}#chosen{margin:0 0 9px;color:var(--green);font-weight:bold}
+.answer-label{display:block;font-weight:bold;margin-bottom:6px}.row{display:flex;flex-wrap:wrap;gap:8px}
+#answer{min-width:0;width:135px;border:2px solid #627d73;border-radius:10px;padding:8px 12px;font-size:1.25rem;background:white;color:var(--ink)}
+button{border-radius:10px;border:1px solid var(--green);padding:9px 13px;min-height:45px;font-weight:bold;color:var(--green);background:white}button.primary{background:var(--green);color:white}button:hover{filter:brightness(.94)}
+#feedback{min-height:1.55em;margin:12px 0;font-weight:bold}#feedback[data-kind=error]{color:#90341e}#feedback[data-kind=ok]{color:#195840}.tools{border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:670px){main{grid-template-columns:1fr;padding:14px}.levels{display:flex;flex-wrap:wrap;gap:6px}.levels label{margin:0}.options{display:flex;flex-wrap:wrap;gap:0 14px}header{padding:24px 18px}.picture{padding:8px;gap:7px}.quantity{padding-inline:6px}.objects{grid-template-columns:repeat(5,1.15rem);gap:2px}.object{font-size:1.08rem}}
+
+.challenge{position:relative;isolation:isolate;min-height:155px;padding:15px 10px 0}
+.watermark{position:absolute;inset:0;z-index:-1;display:grid;place-items:center;font:clamp(6rem,21vw,12rem)/1 system-ui;opacity:.17;pointer-events:none}
+.challenge.with-groups .watermark{align-items:start}
+.challenge.with-groups #statement{min-height:95px}
+.picture{background:#e7f3e9e8}
+dialog{max-width:min(380px,calc(100% - 32px));border:1px solid var(--line);border-radius:16px;background:#fffef9;color:var(--ink);padding:22px}
+dialog::backdrop{background:#192d3280}
+dialog p,#gameover p{margin-top:0}#gameover{padding:14px;background:#f3eee2;border-radius:12px}
+
+#worksheet{margin-top:12px;width:100%}
+#sheet-dialog label{display:block;font-weight:bold;margin-bottom:6px}
+#sheet-count{width:100%;padding:8px;font:inherit}
+#sheet-info{font-size:.9rem;margin:8px 0 14px}
+#feedback-window{width:min(740px,calc(100% - 28px));max-width:none;min-height:min(390px,66vh);padding:28px 16px;border:2px solid var(--popup-border);border-radius:28px;background:var(--popup-bg);color:var(--popup-ink);box-shadow:0 18px 55px #30423835;text-align:center}
+#feedback-window[open]{display:grid;place-content:center;gap:10px}
+#feedback-window[data-kind=success]{--popup-bg:#d5f4cf;--popup-ink:#174a2e;--popup-border:#75b780;--popup-shade:#b8decf6b}
+#feedback-window[data-kind=error]{--popup-bg:#ffe0dc;--popup-ink:#862636;--popup-border:#d38485;--popup-shade:#edc4c46b}
+#feedback-window::backdrop{background:var(--popup-shade)}
+#feedback-title{font-weight:bold;line-height:1.05;font-size:clamp(2.9rem,10vw,6.6rem)}
+#feedback-detail{font-size:clamp(1.35rem,5vw,2.4rem);font-weight:bold}
+
+.top{align-items:center}
+#lives{display:inline-flex;align-items:center;gap:8px;color:#7f2537}
+#hearts{font-size:clamp(2.5rem,7vw,4rem);line-height:1;letter-spacing:.06em;white-space:nowrap;color:#a82946}
+#life-count{font-size:.85rem;white-space:nowrap}
+#bonus-dialog{width:min(1020px,calc(100% - 20px));max-width:none;padding:10px;max-height:calc(100% - 20px)}
+#bonus-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px}
+#bonus-title{margin:0;font-size:1.25rem}
+#bonus-frame iframe{display:block;width:100%;height:min(73vh,660px);border:0;border-radius:12px;background:#152927}
+
+
+.heart{display:inline-block;color:#855565}
+.heart-live{color:#aa2848;animation:heart-glow 2.9s ease-in-out infinite}
+.heart-live:nth-child(2){animation-delay:.22s}
+.heart-live:nth-child(3){animation-delay:.44s}
+@keyframes heart-glow{0%,100%{color:#a82946;text-shadow:0 0 3px #e66d9260}50%{color:#c53963;text-shadow:0 0 12px #e75a8a94}}
+@media(prefers-reduced-motion:reduce){.heart-live{animation:none}}
+.sheet-action{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid #3b7961;border-radius:8px;color:#fff;background:#195840;font-weight:bold;text-decoration:none}
+.sheet-action:focus-visible{outline:3px solid #173e33;outline-offset:2px}
+#sheet-actions{margin-top:10px}
+</style>
+</head>
+<body>
+<header><div><h1>Problemes del dia a dia</h1><p>Tria l’operació i després escriu el resultat.</p></div></header>
+<main>
+<aside aria-label="Opcions del joc">
+<fieldset class="levels"><legend>Dificultat</legend>
+<label><input name="level" type="radio" value="0" checked>Normals</label>
+<label><input name="level" type="radio" value="1">Difícils</label>
+<label><input name="level" type="radio" value="2">Impossible</label>
+<label><input name="level" type="radio" value="3">Master Mode</label>
+</fieldset>
+<fieldset class="options"><legend>Inclou també</legend>
+<label><input id="division" type="checkbox">Divisions</label>
+<label><input id="mixed" type="checkbox">Operacions encadenades</label>
+</fieldset>
+<button id="worksheet" type="button">Genera un PDF</button>
+</aside>
+<article aria-labelledby="progress">
+<div class="top"><span id="progress" tabindex="-1">Problema 1</span><span id="lives" aria-live="polite"><span id="hearts" aria-hidden="true"></span><span id="life-count"></span></span><span id="score" aria-live="polite">0 punts</span></div>
+<div id="challenge" class="challenge">
+<div id="watermark" class="watermark" aria-hidden="true"></div>
+<p id="statement"><span id="story"></span><strong id="question"></strong></p>
+<div id="picture" class="picture" aria-hidden="true"></div>
+</div>
+<div id="operation-step">
+<p id="operation-label">Quina operació faràs?</p>
+<div id="operations" class="row" role="group" aria-labelledby="operation-label">
+<button type="button" data-op="add">+ Suma</button>
+<button type="button" data-op="subtract">− Resta</button>
+<button type="button" data-op="multiply">× Multiplicació</button>
+<button type="button" data-op="divide">÷ Divisió</button>
+</div>
+</div>
+<form id="form" hidden>
+<p id="chosen"></p>
+<label class="answer-label" for="answer">La teva resposta</label>
+<div class="row"><input id="answer" type="text" inputmode="numeric" maxlength="4" autocomplete="off" aria-describedby="statement"><button id="check" class="primary">Comprova</button></div>
+</form>
+<p id="feedback" role="status"></p>
+<div class="row tools"><button id="skip" type="button">Canvia de problema</button></div>
+<div id="gameover" hidden><p id="final-score" tabindex="-1"></p><button id="restart" type="button" class="primary">Torna a jugar</button></div>
+<dialog id="skip-dialog" aria-labelledby="skip-warning">
+<p id="skip-warning">Si canvies de problema, perdràs una vida.</p>
+<form method="dialog" class="row">
+<button value="cancel" autofocus>Continua amb el problema</button>
+<button value="skip" class="primary">Canvia igualment</button>
+</form>
+</dialog>
+</article>
+</main>
+<dialog id="bonus-dialog" aria-labelledby="bonus-title">
+<div id="bonus-header"><h2 id="bonus-title">Repte de tir amb arc</h2><button id="bonus-continue" type="button">Torna als problemes</button></div>
+<div id="bonus-frame"></div>
+</dialog>
+<dialog id="feedback-window" aria-labelledby="feedback-title" aria-describedby="feedback-detail"><div id="feedback-title"></div><div id="feedback-detail"></div></dialog>
+<dialog id="sheet-dialog" aria-labelledby="sheet-title">
+<form id="sheet-form">
+<h2 id="sheet-title">Fitxa de problemes</h2>
+<label for="sheet-count">Quants problemes vols?</label>
+<input id="sheet-count" type="number" min="1" required aria-describedby="sheet-info">
+<p id="sheet-info" aria-live="polite"></p>
+<p id="sheet-error" role="status" hidden></p>
+<div class="row"><button id="sheet-download" type="submit" class="primary">Prepara el PDF</button><button id="sheet-close" type="button">Cancel·la</button></div>
+</form>
+<div id="sheet-actions" class="row" hidden>
+<a id="sheet-open" class="sheet-action" target="_blank" rel="noopener">Obre el PDF</a>
+<a id="sheet-save" class="sheet-action" download="Problemes_del_dia_a_dia.pdf">Desa el PDF</a>
+</div>
+</dialog>
+<script>
+'use strict';
+const contexts = [
+  ['⚽','pilotes','el gimnàs','caixes','equips'],
+  ['🍎','pomes','el mercat','cistelles','famílies'],
+  ['📚','llibres','la biblioteca','prestatges','classes'],
+  ['✏️','llapis','l’aula','estoigs','taules'],
+  ['🍪','galetes','el berenar','plats','infants'],
+  ['🌻','flors','la floristeria','gerros','taules'],
+  ['🧦','mitjons','la botiga','calaixos','persones'],
+  ['🪙','monedes','la fira','bosses','amics'],
+  ['🍓','maduixes','la cuina','bols','infants'],
+  ['🧩','peces de puzle','la ludoteca','bosses','equips'],
+  ['🎈','globus','la festa','bosses','grups'],
+  ['🥕','pastanagues','l’hort','cistelles','famílies'],
+  ['🧁','magdalenes','el forn','safates','grups'],
+  ['🧸','peluixos','la botiga','caixes','classes'],
+  ['🥚','ous','la granja','capses','famílies'],
+  ['🍋','llimones','la fruiteria','cistelles','parades'],
+  ['🔵','fitxes','el club de jocs','bosses','jugadors'],
+  ['🚗','cotxes de joguina','la ludoteca','caixes','grups'],
+  ['🖍️','ceres','el taller de dibuix','pots','taules'],
+  ['🍊','taronges','el menjador','cistelles','classes'],
+  ['🥤','gots','la festa','safates','taules'],
+  ['🥪','entrepans','l’excursió','bosses','grups'],
+  ['🧃','sucs','el pícnic','caixes','equips'],
+  ['🍅','tomàquets','la cooperativa','caixes','famílies'],
+  ['🖼️','quadres','el museu','caixes','sales'],
+  ['🧤','guants','el refugi','bosses','famílies'],
+  ['🍐','peres','la fruiteria','cistelles','taules'],
+  ['🎟️','entrades','el teatre','capses','classes'],
+  ['🧱','maons','el magatzem','caixes','equips'],
+  ['🪴','plantes','el viver','safates','famílies'],
+  ['🏓','pales','el poliesportiu','caixes','equips'],
+  ['🎲','daus','la botiga de jocs','bosses','jugadors'],
+  ['🧵','rodets de fil','el taller de costura','capses','taules'],
+  ['🥖','panets','la fleca','cistelles','classes'],
+  ['🍌','plàtans','el mercat','caixes','famílies'],
+  ['📒','llibretes','la papereria','caixes','classes'],
+  ['🥔','patates','el menjador','bosses','famílies'],
+  ['🐚','petxines','la parada de records','caixes','grups'],
+  ['🧲','imants','el taller de ciències','capses','equips'],
+  ['🧽','esponges','el rebost','caixes','taules']
+];
+
+const container = {
+  caixes:'caixa', cistelles:'cistella', prestatges:'prestatge', estoigs:'estoig',
+  plats:'plat', gerros:'gerro', calaixos:'calaix', bosses:'bossa', bols:'bol',
+  safates:'safata', capses:'capsa', pots:'pot'
+};
+const recipient = {
+  equips:'equip', famílies:'família', classes:'classe', taules:'taula',
+  infants:'infant', persones:'persona', amics:'amic', grups:'grup',
+  parades:'parada', jugadors:'jugador', sales:'sala'
+};
+const singularObjects = {
+  pilotes:'pilota', pomes:'poma', llibres:'llibre', llapis:'llapis', galetes:'galeta',
+  flors:'flor', mitjons:'mitjó', monedes:'moneda', maduixes:'maduixa', 'peces de puzle':'peça de puzle',
+  globus:'globus', pastanagues:'pastanaga', magdalenes:'magdalena', peluixos:'peluix', ous:'ou',
+  llimones:'llimona', fitxes:'fitxa', 'cotxes de joguina':'cotxe de joguina', ceres:'cera',
+  taronges:'taronja', gots:'got', entrepans:'entrepà', sucs:'suc', tomàquets:'tomàquet', quadres:'quadre',
+  guants:'guant', peres:'pera', entrades:'entrada', maons:'maó', plantes:'planta', pales:'pala',
+  daus:'dau', 'rodets de fil':'rodet de fil', panets:'panet', plàtans:'plàtan', llibretes:'llibreta',
+  patates:'patata', petxines:'petxina', imants:'imant', esponges:'esponja'
+};
+const quantityOf = (amount,object) => amount+' '+(amount === 1 ? singularObjects[object] : object);
+
+const templates = {
+  inverse: [
+    (n,o) => [`L’Alícia i en Biel han duit coses per compartir. L’Alícia té ${quantityOf(n[1],o)} i, quan les compten totes, en tenen ${n[0]} entre els dos.`, 'Quants en té en Biel?'],
+    (n,o) => [`Estàs revisant dues bosses abans de sortir. Entre totes dues hi ha ${quantityOf(n[0],o)}. A la primera n’hi ha ${n[1]}.`, 'Quants n’hi ha a la segona bossa?'],
+    (n,o) => [`Dos grups s’ajuden a recollir les coses quan acaba l’activitat. Entre tots han recollit ${quantityOf(n[0],o)}. El primer grup n’ha recollit ${n[1]}.`, 'Quants n’ha recollit el segon?']
+  ],
+  add: [
+    (n,o,p) => [`A l’inici del dia, a ${p} hi ha ${quantityOf(n[0],o)}. Més tard en porten ${n[1]} més.`, `Quants en tenen ara?`],
+    (n,o) => [`L’Aina i en Biel han duit coses per a una activitat. L’Aina té ${quantityOf(n[0],o)} i en Biel en té ${n[1]}.`, 'Quants en tenen entre tots dos?'],
+    (n,o) => [`Abans de començar, mires què hi ha dins les bosses. En una hi ha ${quantityOf(n[0],o)} i a l’altra n’hi ha ${n[1]}.`, 'Quants n’hi ha en total?'],
+    (n,o,p) => [`A ${p} reben dues entregues el mateix dia. Al matí hi arriben ${quantityOf(n[0],o)} i a la tarda n’hi arriben ${n[1]} més.`, 'Quants n’han portat en tot el dia?']
+  ],
+  addMany: [
+    (n,o) => [`Has repartit les coses en diverses caixes. A la primera hi ha ${quantityOf(n[0],o)}. A les altres, les quantitats són ${list(n.slice(1))}.`, 'Quants n’hi ha en total?'],
+    (n,o) => [`Per a una activitat, ${n.length} grups porten ${o}. Les quantitats que du cada grup són ${list(n)}.`, 'Quants en porten en total?']
+  ],
+  subtract: [
+    (n,o,p) => [`Abans que arribi la Marta, a ${p} hi ha ${quantityOf(n[0],o)}. Quan se’n va, se n’enduu ${n[1]}.`, 'Quants en queden?'],
+    (n,o) => [`Tens ${quantityOf(n[0],o)} i un amic te’n demana per a una activitat. En dones ${n[1]} i et quedes la resta.`, 'Quants te’n queden?'],
+    (n,o) => [`En Marc i la Júlia comparen què han duit. En Marc té ${quantityOf(n[0],o)} i la Júlia en té ${n[1]}.`, 'Quants en té de més en Marc?'],
+    (n,o) => [`Estàs preparant una activitat i necessites ${quantityOf(n[0],o)}. Revises què tens a mà i en trobes ${n[1]}.`, 'Quants te’n falten?']
+  ],
+  subtractMany: [
+    (n,o) => [`A l’hora de repartir, tens ${quantityOf(n[0],o)}. L’Aina et demana que n’hi donis ${n[1]} i en Pol te’n demana ${n[2]}. Els en dones a tots dos.`, 'Quants te’n queden?'],
+    (n,o,p) => [`Quan comença el dia, a ${p} hi ha ${quantityOf(n[0],o)}. Un grup se n’enduu ${n[1]} al matí i un altre se n’enduu ${n[2]} a la tarda.`, 'Quants en queden?']
+  ],
+  multiply: [
+    (n,o,p,b) => [`A ${p} han preparat ${n[0]} ${b}. Hi han posat la mateixa quantitat a tot arreu. Cada ${container[b]} té ${quantityOf(n[1],o)}.`, 'Quants n’hi ha en total?'],
+    (n,o,p) => [`A ${p} preparen una activitat i fan ${n[0]} grups. Quan tot està a punt, cada grup rep ${quantityOf(n[1],o)}.`, 'Quants se’n reparteixen en total?'],
+    (n,o) => [`Per preparar una activitat, durant ${n[0]} dies fan una recollida de ${o}. Cada dia en porten ${n[1]}.`, 'Quants n’han portat en total?']
+  ],
+  divide: [
+    (n,o,p,b,g) => [`Has preparat ${quantityOf(n[0],o)} per repartir entre ${n[1]} ${g}. Vols que tothom en rebi la mateixa quantitat.`, `Quants en rep cada ${recipient[g]}?`],
+    (n,o) => [`A l’hora de recollir, tens ${quantityOf(n[0],o)} per guardar. Treus unes bosses i en poses ${n[1]} a cada bossa.`, 'Quantes bosses omples?'],
+    (n,o) => [`En acabar l’activitat, ${n[1]} persones s’han de repartir ${quantityOf(n[0],o)}. Acorden que tothom en rebrà la mateixa quantitat.`, 'Quants en rep cada persona?']
+  ],
+  divideAdd: [
+    (n,o) => [`Els grups ja són a punt per començar. Reparteixes ${quantityOf(n[0],o)} a parts iguals entre ${n[1]} grups. Quan arriba una altra capsa, dones ${n[2]} més a cada grup.`, 'Quants en té cada grup al final?']
+  ],
+  subtractDivide: [
+    (n,o) => [`Has preparat ${quantityOf(n[0],o)} per repartir. Abans de començar, en guardes ${n[1]} per a un altre dia. Reparteixes la resta a parts iguals entre ${n[2]} persones.`, 'Quants en rep cada persona?']
+  ],
+  addThree: [
+    (n,o,p) => [`A ${p} han començat una recollida amb ${quantityOf(n[0],o)}. Durant el dia hi passen tres persones. Hi deixen ${n[1]}, ${n[2]} i ${n[3]} més, per aquest ordre.`, 'Quants n’hi ha ara?'],
+    (n,o) => [`Has començat una col·lecció amb ${quantityOf(n[0],o)}. Els amics t’ajuden a fer-la créixer. La Paula te’n dona ${n[1]}, en Marc ${n[2]} i la Jana ${n[3]}.`, 'Quants en tens ara?']
+  ],
+  addSubtractAdd: [
+    (n,o,p) => [`Al matí, a ${p} hi ha ${quantityOf(n[0],o)}. En porten ${n[1]} més. Un grup se n’enduu ${n[2]} per fer una activitat i, quan acaba, en torna ${n[3]}.`, 'Quants n’hi ha al final?'],
+    (n,o) => [`Estàs preparant una activitat per a demà. Tens ${quantityOf(n[0],o)} i en compres ${n[1]} més. En deixes ${n[2]} a l’escola. En sortir, un amic te’n dona ${n[3]}.`, 'Quants en tens ara?']
+  ],
+  multiplyAddSubtract: [
+    (n,o) => [`Estàs ordenant les coses que han arribat. Tens ${n[0]} capses amb ${quantityOf(n[1],o)} a cadascuna. N’hi afegeixes ${n[2]} que tenies de reserva i després en dones ${n[3]}.`, 'Quants te’n queden?'],
+    (n,o) => [`Per preparar l’activitat, han posat ${quantityOf(n[1],o)} a cadascuna de les ${n[0]} taules. Just abans de començar n’hi afegeixen ${n[2]} i després en retiren ${n[3]}.`, 'Quants en queden?']
+  ],
+  addTwice: [
+    (n,o,p) => [`A ${p} han començat el dia amb ${quantityOf(n[0],o)}. Durant el matí hi arriba una entrega amb ${n[1]} més i a la tarda n’arriba una altra amb ${n[2]} més.`, 'Quants n’hi ha al final del dia?'],
+    (n,o) => [`Per a l’activitat de demà, ja has preparat ${quantityOf(n[0],o)}. Quan ho expliques a la Jana i en Pol, la Jana te’n dona ${n[1]} i en Pol te’n dona ${n[2]}.`, 'Quants en tens ara?']
+  ],
+  addSubtract: [
+    (n,o,p) => [`A l’inici del dia, a ${p} hi ha ${quantityOf(n[0],o)}. Més tard en porten ${n[1]} més. Després se n’enduen ${n[2]}.`, 'Quants en queden?'],
+    (n,o) => [`Quan arribes a l’aula, treus el que has duit. A la motxilla hi ha ${quantityOf(n[0],o)} i dins una bossa n’hi ha ${n[1]}. En deixes ${n[2]} a l’aula i t’endús la resta.`, 'Quants te’n queden?']
+  ],
+  multiplyAdd: [
+    (n,o) => [`Vols saber què hi ha damunt la taula abans de recollir. Hi ha ${n[0]} capses amb ${quantityOf(n[1],o)} a cadascuna. A fora de les capses n’hi ha ${n[2]} més.`, 'Quants n’hi ha en total?'],
+    (n,o) => [`La classe es prepara per fer una activitat. A cadascuna de les ${n[0]} taules hi ha ${quantityOf(n[1],o)}. Abans de començar, la mestra en porta ${n[2]} més.`, 'Quants n’hi ha ara?']
+  ]
+};
+const purchases = [
+  ['🥖','Al forn','una barra de pa','una ensaïmada'],
+  ['🛒','Al supermercat','una bossa de pasta','un pot de salsa'],
+  ['📒','A la papereria','una llibreta','un estoig'],
+  ['🌷','A la floristeria','una rosa','un gerro'],
+  ['🎪','A la fira','una entrada','un berenar'],
+  ['🎨','A la botiga de manualitats','un pinzell','un pot de pintura'],
+  ['🏖️','A la botiga de la platja','una pilota','un poal'],
+  ['🎬','Al cinema','una entrada','una capsa de crispetes'],
+  ['🥕','Al mercat','una bossa de pastanagues','una bossa de patates'],
+  ['📚','A la llibreria','un còmic','un punt de llibre']
+];
+const spending = [
+  ['🚌','Has d’agafar el bus per tornar a casa','un bitllet de bus'],
+  ['🍦','Després de passejar, t’atures a la gelateria','un gelat'],
+  ['🎁','Demà és l’aniversari d’un amic','un regal'],
+  ['🎫','Aquesta tarda vas a nedar','una entrada de piscina'],
+  ['🍕','Heu demanat pizza per sopar','el sopar'],
+  ['🧸','A la fira veus un peluix que t’agrada','un peluix'],
+  ['🎡','Has anat a la fira i vols pujar a la roda','una volta a la roda'],
+  ['🎒','Necessites una motxilla per dur el material','una motxilla'],
+  ['🥪','És hora de berenar i t’atures al forn','un entrepà'],
+  ['🪁','Fa vent i vols fer volar un estel a la platja','un estel']
+];
+const bills = [
+  ['🧾','Has dinat al restaurant'],['🚰','T’ha arribat el rebut de l’aigua'],['💡','T’ha arribat el rebut de la llum'],
+  ['📱','T’ha arribat la factura del mòbil'],['🛠️','Has duit la bici a reparar'],['🏕️','Has reservat una estada al càmping'],
+  ['🧺','Has duit la roba a la bugaderia'],['🖨️','Has fet una comanda de fotocòpies'],
+  ['🚕','Has agafat un taxi'],['🔌','T’ha arribat el rebut del gas']
+];
+const prices = [
+  ['🍎','Per al berenar de l’excursió','pomes'],['🧃','Per a la festa','sucs'],
+  ['⚽','Per entrenar amb l’equip','pilotes'],['🧁','Per compartir a la sortida','magdalenes'],
+  ['🗺️','Per orientar-vos durant una excursió','mapes'],['🪴','Per decorar el balcó','plantes'],
+  ['🧤','Per a una sortida a la neu','parells de guants'],['🍋','Per fer llimonada','bosses de llimones'],
+  ['🎟️','Per anar al teatre amb els amics','entrades'],['📦','Per endreçar l’habitació','capses']
+];
+const timeActivities = [
+  ['🚌','Vas a visitar uns amics','El bus','surt','arriba'],
+  ['🚆','Tens els bitllets per a una excursió en tren','El tren','surt','arriba'],
+  ['⛴️','Aneu al port per agafar el ferri','El ferri','surt','arriba'],
+  ['🧑‍🍳','T’has apuntat a un taller per aprendre a fer pa','El taller','comença','acaba'],
+  ['🎬','Vols veure una pel·lícula amb uns amics','La pel·lícula','comença','acaba'],
+  ['🏊','Heu reservat una activitat a la piscina','L’activitat','comença','acaba'],
+  ['🎭','Vas al teatre amb la classe','La funció','comença','acaba'],
+  ['🎲','Has quedat per jugar a un joc de taula','La partida','comença','acaba'],
+  ['🎨','Avui tens un taller de pintura','El taller','comença','acaba'],
+  ['🏀','El teu equip participa en un torneig','El torneig','comença','acaba']
+];
+const durations = [
+  ['🎹','Assages una cançó nova al piano','hi vas practicar','hi has practicat','has practicat en total'],
+  ['📖','Has agafat un còmic de la biblioteca','el vas llegir durant','l’has llegit durant','has llegit en total'],
+  ['🐕','Aquests dies treus el gos a passejar abans de sopar','el vas passejar durant','l’has passejat durant','l’has passejat entre els dos dies'],
+  ['🧹','Vols tenir l’habitació endreçada abans que vengui un amic','hi vas dedicar','hi has dedicat','has dedicat a endreçar-la'],
+  ['🥣','A casa prepareu el berenar entre tots','hi vas dedicar','hi has dedicat','has dedicat a fer el berenar'],
+  ['🚲','Practiques amb la bici a la plaça','hi vas anar durant','hi has anat durant','has anat en bici entre els dos dies'],
+  ['🧩','Tens un puzle a mitges damunt la taula','hi vas treballar durant','hi has treballat durant','has dedicat al puzle'],
+  ['🌿','T’encarregues de regar les plantes del balcó','les vas regar durant','les has regat durant','has dedicat a regar-les'],
+  ['🧣','Estàs fent una bufanda de mitja','hi vas treballar durant','hi has treballat durant','has dedicat a fer la bufanda'],
+  ['✍️','Abans d’anar a dormir, escrius al diari','hi vas escriure durant','hi has escrit durant','has dedicat a escriure-hi']
+];
+const minutes = amount => amount + (amount === 1 ? ' minut' : ' minuts');
+
+function clockTimes(kind,level) {
+  const start = randomInt(8,level < 2 ? 12 : 18);
+  const duration = randomInt(1,level < 2 ? 3 : 5);
+  const end = start + duration;
+  return kind === 'add' ? [[start,duration],end] : [[end,start],duration];
+}
+
+function itemHeading(item) {
+  const name = item.replace(/^un(?:a)? /,'');
+  return name.charAt(0).toLocaleUpperCase('ca') + name.slice(1);
+}
+
+const specialScenes = [
+  ...purchases.map(([icon,place,item,extra]) => ({icon, group:'💶', kind:'add', labels:[itemHeading(item),itemHeading(extra)],
+    wording: ([a,b]) => [`${place}, vols comprar ${item} i ${extra}. Mires els preus i veus que ${item} costa ${a} € i ${extra} costa ${b} €.`, 'Quant costen les dues coses juntes?']})),
+  ...spending.map(([icon,setup,item]) => ({icon, group:'💶', kind:'subtract',
+    wording: ([a,b]) => [`${setup}. Al moneder tens ${a} € i en gastes ${b} € per pagar ${item}.`, 'Quants euros et queden?']})),
+  ...bills.map(([icon,subject]) => ({icon, group:'💶', kind:'inverse',
+    wording: ([a,b]) => [`${subject}. El total és de ${a} € i ja n’has pagat ${b} €.`, 'Quants euros et falten per pagar?']})),
+  ...prices.map(([icon,setup,item]) => ({icon, group:'💶', kind:'multiply', labels:['Preu per unitat'],
+    wording: ([a,b]) => [`${setup}, tries ${a} ${item}. Abans de pagar, mires el cartell de preus i veus que cada unitat costa ${b} €.`, 'Quants euros pagues en total?']})),
+  ...timeActivities.flatMap(([icon,setup,activity,startVerb,endVerb]) => [
+    {icon, group:'🕐', kind:'add', values:clockTimes,
+      wording: ([a,b]) => [`${setup}. ${activity} ${startVerb} a les ${a}:00. ${startVerb === 'surt' ? 'El trajecte' : 'L’activitat'} dura ${b} ${b === 1 ? 'hora' : 'hores'}.`, `A quina hora ${endVerb}? Escriu només l’hora.`]},
+    {icon, group:'🕐', kind:'subtract', values:clockTimes,
+      wording: ([a,b]) => [`${setup}. ${activity} ${startVerb} a les ${b}:00 i ${endVerb} a les ${a}:00.`, 'Quantes hores dura?']}
+  ]),
+  ...durations.map(([icon,activity,yesterday,today,question]) => ({icon, group:'⏱️', kind:'add',
+    labels:['Ahir','Avui'],
+    wording: ([a,b]) => [`${activity}. Ahir ${yesterday} ${minutes(a)} i avui ${today} ${minutes(b)}.`, `Quants minuts ${question}?`]})),
+  {icon:'🧾',group:'💶',kind:'addSubtract',wording:([a,b,c]) => [`T’ha arribat una factura amb dos càrrecs. El primer és de ${a} € i el segon, de ${b} €. Quan mires el rebut, veus que ja has pagat ${c} €.`,'Quant et falta pagar?']},
+  {icon:'🛍️',group:'💶',kind:'multiplyAdd',labels:['Llibreta','Llapis'],wording:([a,b,c]) => [`Vas a la papereria a cercar material per a classe. Compres ${a} llibretes de ${b} € cadascuna i hi afegeixes un llapis de ${c} €.`,'Quant pagues en total?']},
+  {icon:'🍕',group:'💶',kind:'divide',wording:([a,b]) => [`Heu compartit una pizza i ara arriba el compte. Costa ${a} € i decidiu repartir el preu a parts iguals entre ${b} persones.`,'Quant paga cadascú?']},
+  {icon:'⏰',group:'⏱️',kind:'addTwice',wording:([a,b,c]) => [`T’has reservat unes estones per continuar un llibre. Al matí llegeixes ${minutes(a)}. Abans de sopar hi dediques ${minutes(b)} més i després de sopar, ${minutes(c)} més.`,'Quants minuts has llegit en total?']}
+];
+
+const extraProblemRows = [
+  ["add", "🚌", ["Primera parada", "Segona parada"], "El bus escolar fa dues parades abans d’arribar a l’institut. A la primera hi pugen {a} alumnes i a la segona n’hi pugen {b}.", "Quants alumnes han pujat entre les dues parades?"],
+  ["add", "📫", ["Bústia de l’entrada", "Bústia del pati"], "Reculls les cartes del centre. A la bústia de l’entrada n’hi ha {a} i a la del pati n’hi ha {b}.", "Quantes cartes reculls en total?"],
+  ["add", "🍓", ["Dilluns", "Dimarts"], "A l’hort escolar, cada dia pesen la collita. Dilluns cullen {a} {a?quilo:quilos} de maduixes i dimarts en cullen {b}.", "Quants quilos de maduixes han collit entre tots dos dies?"],
+  ["add", "🐚", ["Vora l’aigua", "Damunt la sorra"], "Durant una passejada, reculls {a} petxines vora l’aigua. Més endavant en trobes {b} damunt la sorra.", "Quantes petxines has recollit?"],
+  ["add", "🧺", ["Roba blanca", "Roba de color"], "Abans de fer la bugada, separes la roba. Hi ha {a} peces de roba blanca i {b} peces de roba de color.", "Quantes peces hauràs de rentar?"],
+  ["add", "🎟️", ["Comandes per internet", "Taquilla"], "El teatre ven {a} entrades per internet i {b} a la taquilla. Quan tanca, compta totes les vendes.", "Quantes entrades ha venut?"],
+  ["add", "🍞", ["Barres", "Panets"], "Abans d’obrir la fleca, col·loques {a} barres en un prestatge i {b} panets en un altre.", "Quantes peces de pa has col·locat?"],
+  ["add", "🧦", ["Parells al calaix", "Parells a l’estenedor"], "Busques mitjons per fer la maleta. Trobes {a} {a?parell:parells} al calaix i {b} a l’estenedor.", "Quants parells de mitjons tens a mà?"],
+  ["add", "📚", ["Préstecs al matí", "Préstecs a la tarda"], "La biblioteca anota els llibres que deixa en préstec. Al matí en deixa {a} i a la tarda en deixa {b}.", "Quants llibres ha deixat en préstec durant el dia?"],
+  ["add", "🎮", ["Partida de l’Èric", "Partida de la Nora"], "L’Èric i la Nora juguen en equip. L’Èric aporta {a} punts i la Nora n’aporta {b}.", "Quants punts ha fet l’equip?"],
+  ["add", "🐶", ["Gossos grossos", "Gossos petits"], "Al refugi separen els gossos per mida abans de passejar-los. Al pati hi ha {a} gossos grossos i {b} de petits.", "Quants gossos passejaran?"],
+  ["addMany", "🧁", ["Primera safata", "Segona safata", "Tercera safata", "Quarta safata"], "Acabes de treure unes safates de magdalenes del forn. Les quantitats que hi ha a les safates són {list}.", "Quantes magdalenes has fet?"],
+  ["addMany", "🚲", ["Carril del parc", "Carril del pont", "Carril de l’escola", "Carril del mercat"], "Per planificar una ruta, anotes quantes bicis hi ha a cada aparcament. Els recomptes, en ordre, són {list}.", "Quantes bicis has comptat en total?"],
+  ["addMany", "🥫", ["Primer grup", "Segon grup", "Tercer grup", "Quart grup"], "A l’escola recullen pots d’aliments. Els grups n’han duit aquestes quantitats, en ordre: {list}.", "Quants pots han recollit entre tots?"],
+  ["addMany", "📦", ["Primera entrega", "Segona entrega", "Tercera entrega", "Quarta entrega"], "A la botiga han arribat diverses entregues durant el dia. A cada entrega hi havia aquesta quantitat de paquets, en ordre: {list}.", "Quants paquets han arribat a la botiga?"],
+  ["subtract", "💧", ["Aigua inicial", "Aigua gastada"], "Omples una garrafa amb {a} {a?litre:litres} d’aigua per netejar el pati. Al final de la feina n’has gastat {b}.", "Quants litres queden a la garrafa?"],
+  ["subtract", "🎬", ["Aforament", "Seients ocupats"], "Just abans que comenci la pel·lícula, l’acomodadora revisa la sala. Hi ha {a} seients i {b} estan ocupats.", "Quants seients són buits?"],
+  ["subtract", "🥪", ["Entrepans preparats", "Entrepans venuts"], "El bar prepara {a} entrepans per al descans. Quan acaba el descans, n’ha venut {b}.", "Quants entrepans li queden?"],
+  ["subtract", "🎨", ["Fulls a la carpeta", "Fulls emprats"], "Abans de començar un mural, treus una carpeta amb {a} fulls de colors. Per fer el dibuix n’empres {b}.", "Quants fulls queden a la carpeta?"],
+  ["subtract", "🚌", ["Passatgers a bord", "Passatgers que baixen"], "Quan el bus arriba a la plaça, du {a} passatgers. En aquesta parada en baixen {b} i no hi puja ningú.", "Quants passatgers continuen al bus?"],
+  ["subtract", "🌱", ["Llavors sembrades", "Llavors que han brotat"], "Sembres {a} llavors en una safata. Una setmana després, comptes que n’han brotat {b}.", "Quantes llavors encara no han brotat?"],
+  ["subtract", "🕯️", ["Espelmes de la capsa", "Espelmes enceses"], "Per preparar una festa, obres una capsa amb {a} espelmes. N’encens {b} per decorar el pati.", "Quantes espelmes queden sense encendre?"],
+  ["subtract", "📏", ["Cinta sencera", "Tros tallat"], "Per penjar un cartell, tens una cinta de {a} {a?metre:metres}. En talles un tros de {b} {b?metre:metres}.", "Quants metres de cinta et queden?"],
+  ["subtract", "⚽", ["Gols del primer equip", "Gols del segon equip"], "Dos equips fan un concurs de penals. El primer marca {a} gols i el segon en marca {b}.", "Quants gols més ha marcat el primer equip?"],
+  ["subtract", "🧃", ["Ampolles a la caixa", "Ampolles buides"], "Al final del pícnic, hi ha {a} ampolles de suc a la caixa. D’aquestes, {b} ja són buides.", "Quantes ampolles encara tenen suc?"],
+  ["subtract", "🧩", ["Peces del puzle", "Peces col·locades"], "Comences un puzle que té {a} peces. Abans d’anar a sopar n’has col·locat {b}.", "Quantes peces et falten per col·locar?"],
+  ["subtractMany", "🎫", ["Entrades disponibles", "Entrades de l’escola", "Entrades del casal"], "Per a un concert, queden {a} entrades lliures. L’escola en reserva {b} i el casal en reserva {c}.", "Quantes entrades queden lliures?"],
+  ["subtractMany", "🧴", ["Amb aigua", "Per al pati", "Per al jardí"], "Per netejar, omples un poal amb {a} {a?litre:litres} d’aigua. En gastes {b} al pati i {c} al jardí.", "Quants litres d’aigua et queden?"],
+  ["subtractMany", "🍊", ["Collita", "Per a casa", "Per a la veïna"], "Arribes de l’hort amb {a} taronges. En deixes {b} a casa i en dones {c} a la veïna.", "Quantes taronges encara dus al cistell?"],
+  ["subtractMany", "📒", ["Quaderns inicials", "Per a la classe", "Per al taller"], "A la sala de material hi ha {a} quaderns. En duus {b} a una classe i {c} al taller de tarda.", "Quants quaderns queden a la sala?"],
+  ["inverse", "🎁", ["Preu del regal", "Aportació de la Noa"], "La Noa i en Pau comparteixen el cost d’un regal de {a} €. La Noa hi posa {b} €.", "Quants euros hi ha de posar en Pau?"],
+  ["inverse", "💡", ["Consum del rebut", "Consum de la cuina"], "A casa reviseu el consum del dia. El rebut marca {a} kWh en total i els aparells de la cuina n’han gastat {b}.", "Quants kWh han gastat els altres aparells?"],
+  ["inverse", "🧱", ["Peces necessàries", "Peces aportades"], "Entre tu i la Júlia necessiteu {a} peces per acabar una maqueta. Tu en duus {b}.", "Quantes peces hi ha de dur la Júlia?"],
+  ["inverse", "🥕", ["Hortalisses del cistell", "Pastanagues"], "Omples un cistell amb pastanagues i patates. En total hi poses {a} hortalisses i {b} són pastanagues.", "Quantes patates hi has posat?"],
+  ["inverse", "💶", ["Diners actuals", "Diners del regal"], "Has rebut {b} € d’aniversari i els guardes al moneder. Ara, en comptar-los, hi trobes {a} €.", "Quants euros hi havia abans del regal?"],
+  ["inverse", "📨", ["Cartes totals", "Cartes de la tarda"], "Al final del dia, el carter ha repartit {a} cartes. A la tarda n’ha repartit {b}.", "Quantes cartes havia repartit al matí?"],
+  ["inverse", "🥛", ["Llet del matí", "Llet que queda"], "Al matí tenies {a} {a?litre:litres} de llet. Després de preparar el berenar, te’n queden {b}.", "Quants litres de llet has gastat?"],
+  ["inverse", "🎮", ["Total de punts", "Punts de la segona ronda"], "Jugues dues rondes a un joc de taula. Acabes amb {a} punts i saps que a la segona ronda n’has fet {b}.", "Quants punts havies fet a la primera ronda?"],
+  ["multiply", "🚲", ["Lots", "Rodes per lot"], "Una botiga prepara {a} lots per reparar bicicletes. A la capsa de cada lot hi posa {b} rodes de recanvi.", "Quantes rodes de recanvi han de preparar?"],
+  ["multiply", "🌿", ["Safates", "Testos per safata"], "Per dur els testos al viver, prepares {a} safates. Col·loques {b} testos a cada safata.", "Quants testos hi duràs?"],
+  ["multiply", "🎟️", ["Famílies", "Entrades per família"], "Per a la festa de l’escola venen entrades a {a} famílies. Cada família n’ha reservat {b}.", "Quantes entrades han reservat en total?"],
+  ["multiply", "🚐", ["Furgonetes", "Caixes per furgoneta"], "A l’hora de repartir la compra del mercat, surten {a} furgonetes. Cadascuna du {b} caixes.", "Quantes caixes reparteixen?"],
+  ["multiply", "🫙", ["Pots", "Bales per pot"], "Per ordenar la col·lecció, tries {a} pots iguals. Dins cada pot hi poses {b} bales.", "Quantes bales has guardat?"],
+  ["multiply", "🛍️", ["Bosses", "Panets per bossa"], "La fleca prepara {a} bosses per al berenar d’un equip. A cadascuna hi posa {b} panets.", "Quants panets ha preparat?"],
+  ["multiply", "🍴", ["Taules", "Coberts per taula"], "Al menjador han de parar {a} taules. A cada taula hi posen {b} coberts.", "Quants coberts hi posen entre totes les taules?"],
+  ["multiply", "🧁", ["Safates", "Magdalenes per safata"], "Al forn acaben de preparar {a} safates pel berenar. Totes les safates tenen {b} magdalenes.", "Quantes magdalenes hi ha preparades?"],
+  ["multiply", "🧵", ["Polseres", "Peces per polsera"], "Per a la paradeta de l’escola, vols fer {a} polseres. Cada polsera du {b} peces de colors.", "Quantes peces de colors necessites?"],
+  ["multiply", "🚶", ["Dies", "Voltes per dia"], "Per preparar una caminada, entrenes durant {a} dies. Cada dia fas {b} voltes al parc.", "Quantes voltes has fet en total?"],
+  ["multiply", "🧺", ["Cistells", "Pomes per cistell"], "A l’hort preparen {a} cistells per enviar a la botiga. A cada cistell hi posen {b} pomes.", "Quantes pomes envien a la botiga?"],
+  ["multiply", "✉️", ["Sobres", "Adhesius per sobre"], "Per preparar la festa, omples {a} sobres amb adhesius. A cada sobre n’hi poses {b}.", "Quants adhesius necessites?"],
+  ["addTwice", "📕", ["Llibres guardats", "Donació del matí", "Donació de la tarda"], "Per al racó de lectura ja teniu {a} llibres. Al matí us en donen {b} i a la tarda n’arriben {c} més.", "Quants llibres teniu ara?"],
+  ["addTwice", "🪙", ["Guardiola", "Diners de la mare", "Diners de l’avi"], "A la guardiola tens {a} €. La mare t’hi ajuda amb {b} € i el teu avi t’hi afegeix {c} € més.", "Quants euros tens ara?"],
+  ["addTwice", "🚌", ["Passatgers a l’inici", "Primera parada", "Segona parada"], "El bus surt amb {a} passatgers. A la primera parada n’hi pugen {b} i a la següent n’hi pugen {c} més. No en baixa ningú.", "Quants passatgers du ara?"],
+  ["addTwice", "🗑️", ["Papers al sac", "Papers de la plaça", "Papers del parc"], "Comences a netejar el carrer amb {a} papers dins el sac. A la plaça en reculls {b} i al parc en reculls {c} més.", "Quants papers hi ha ara al sac?"],
+  ["addTwice", "🍅", ["Tomàquets al cistell", "Primera planta", "Segona planta"], "Ja tens {a} tomàquets al cistell. En culls {b} d’una planta i després en culls {c} d’una altra.", "Quants tomàquets tens al cistell?"],
+  ["addSubtract", "🥪", ["Entrepans preparats", "Entrepans afegits", "Entrepans servits"], "Per al descans prepares {a} entrepans. En fas {b} més quan arriba un altre grup. Després en serveixes {c}.", "Quants entrepans et queden?"],
+  ["addSubtract", "🧩", ["Peces a la caixa", "Peces trobades", "Peces col·locades"], "En una caixa hi ha {a} peces d’un puzle. En trobes {b} més davall la taula i les hi poses. Després en treus {c} per col·locar-les.", "Quantes peces queden a la caixa?"],
+  ["addSubtract", "💶", ["Diners inicials", "Diners guanyats", "Diners gastats"], "Dius adéu a un amic amb {a} € al moneder. A casa guanyes {b} € ajudant a endreçar i, a la tarda, et gastes {c} €.", "Quants euros tens al final?"],
+  ["addSubtract", "🧤", ["Guants a la caixa", "Guants retornats", "Guants prestats"], "Al magatzem de material queden {a} guants. Un grup en retorna {b} i, més tard, en presten {c} a un altre grup.", "Quants guants hi ha al magatzem?"],
+  ["addSubtract", "🥤", ["Gots nets", "Gots eixugats", "Gots servits"], "Al menjador hi ha {a} gots nets. N’eixugues {b} més i els hi afegeixes. Després en treuen {c} per parar les taules.", "Quants gots nets queden per repartir?"],
+  ["multiplyAdd", "🍋", ["Caixes", "Llimones per caixa", "Llimones soltes"], "Al mercat arriben {a} caixes amb {b} llimones cadascuna. A la parada ja hi havia {c} llimones soltes.", "Quantes llimones hi ha ara a la parada?"],
+  ["multiplyAdd", "🚐", ["Furgonetes", "Caixes per furgoneta", "Caixes al magatzem"], "Arriben {a} furgonetes amb {b} caixes cadascuna. Les descarreguen i les ajunten amb les {c} que ja hi havia al magatzem.", "Quantes caixes hi ha ara al magatzem?"],
+  ["multiplyAdd", "🍪", ["Plats", "Galetes per plat", "Galetes soltes"], "Per al berenar, has preparat {a} plats amb {b} galetes a cada plat. També hi ha {c} galetes soltes en una safata.", "Quantes galetes has preparat?"],
+  ["multiplyAdd", "📚", ["Prestatges", "Llibres per prestatge", "Llibres a taula"], "Endreces {a} prestatges i poses {b} llibres a cadascun. Encara te’n queden {c} damunt la taula.", "Quants llibres tenies per endreçar?"],
+  ["multiplyAdd", "🎮", ["Rondes", "Punts per ronda", "Punts de bonificació"], "En un joc, completes {a} rondes amb {b} punts a cadascuna. Quan acabes, reps {c} punts de bonificació.", "Quants punts has fet?"],
+  ["addThree", "🥫", ["Pots inicials", "Primer grup", "Segon grup", "Tercer grup"], "La recollida d’aliments comença amb {a} pots. Al llarg del dia, tres grups hi aporten {b}, {c} i {d} pots més.", "Quants pots hi ha quan acaba la recollida?"],
+  ["addThree", "🐚", ["Petxines inicials", "Vora l’aigua", "A les roques", "A la sortida"], "Arribes a la platja amb {a} petxines al poal. En trobes {b} vora l’aigua, {c} a les roques i {d} a la sortida.", "Quantes petxines dus quan te’n vas?"],
+  ["addThree", "🧮", ["Punts d’inici", "Primera prova", "Segona prova", "Tercera prova"], "Un equip comença el concurs amb {a} punts. A les tres proves següents n’aconsegueix {b}, {c} i {d}, per aquest ordre.", "Quants punts té en acabar?"],
+  ["addThree", "🍎", ["Pomes d’inici", "Primera família", "Segona família", "Tercera família"], "Per fer suc, tens {a} pomes al rebost. Tres famílies te’n porten més: {b} la primera, {c} la segona i {d} la tercera.", "Quantes pomes pots fer servir?"],
+  ["addThree", "🪙", ["Estalvis", "Primera aportació", "Segona aportació", "Tercera aportació"], "Vols estalviar per a una excursió i comences amb {a} €. En tres dies hi afegeixes {b} €, {c} € i {d} €.", "Quants euros tens estalviats després dels tres dies?"],
+  ["addSubtractAdd", "🚌", ["Passatgers inicials", "Pugen a la plaça", "Baixen al mercat", "Pugen al parc"], "El bus surt amb {a} passatgers. A la plaça en pugen {b}, al mercat en baixen {c} i al parc en pugen {d}.", "Quants passatgers hi ha després de la parada del parc?"],
+  ["addSubtractAdd", "🎟️", ["Entrades inicials", "Entrades afegides", "Entrades venudes", "Reserves cancel·lades"], "A taquilla queden {a} entrades. El teatre n’hi afegeix {b}, en ven {c} i, quan es cancel·len unes reserves, hi tornen {d} entrades.", "Quantes entrades queden disponibles?"],
+  ["addSubtractAdd", "🧺", ["Roba al cistell", "Roba afegida", "Roba rentada", "Roba afegida al vespre"], "Tens {a} peces al cistell de la bugada. N’hi poses {b} més i en rentes {c}. Al vespre n’hi deixes {d} més.", "Quantes peces queden per rentar?"],
+  ["addSubtractAdd", "🎨", ["Pinzells d’inici", "Compra", "Pinzells retirats", "Préstec"], "Al taller hi ha {a} pinzells. En compres {b}, en retires {c} de fets malbé i una altra classe te’n deixa {d} més.", "Amb quants pinzells pots treballar?"],
+  ["addSubtractAdd", "🥖", ["Pa inicial", "Primera fornada", "Vendes", "Segona fornada"], "A primera hora la fleca té {a} peces de pa. En treu {b} del forn, en ven {c} i després en cou {d} més.", "Quantes peces de pa hi ha ara?"],
+  ["multiplyAddSubtract", "🧃", ["Caixes", "Sucs per caixa", "Sucs solts", "Sucs beguts"], "Per a la festa obres {a} caixes amb {b} sucs cadascuna. Hi afegeixes {c} sucs solts i, durant la festa, se’n beuen {d}.", "Quants sucs queden?"],
+  ["multiplyAddSubtract", "🖍️", ["Estoigs", "Ceres per estoig", "Ceres afegides", "Ceres prestades"], "Per preparar la classe, treus {a} estoigs amb {b} ceres cadascun. Hi afegeixes {c} ceres del calaix i en deixes {d} en préstec.", "Quantes ceres et queden?"],
+  ["multiplyAddSubtract", "🌷", ["Gerros", "Flors per gerro", "Flors noves", "Flors retirades"], "Per decorar la sala omples {a} gerros amb {b} flors cadascun. Després hi afegeixes {c} flors i en retires {d} de marcides.", "Quantes flors queden per decorar la sala?"],
+  ["multiplyAddSubtract", "⚽", ["Equips", "Pilotes per equip", "Pilotes afegides", "Pilotes retirades"], "Al gimnàs, {a} equips duen {b} pilotes cadascun. El professor n’hi afegeix {c} del magatzem i en retira {d} de desinflades.", "Quantes pilotes es poden fer servir?"],
+  ["multiplyAddSubtract", "📦", ["Capses", "Peces per capsa", "Peces soltes", "Peces emprades"], "Per fer una maqueta, obres {a} capses amb {b} peces cadascuna. Hi afegeixes {c} peces soltes i n’empres {d}.", "Quantes peces et queden?"],
+  ["divide", "🥕", ["Pastanagues", "Conills"], "Al refugi prepares {a} pastanagues per a {b} conills. N’hi vols donar la mateixa quantitat a cadascun.", "Quantes pastanagues rep cada conill?"],
+  ["divide", "💶", ["Import", "Amics"], "Després d’una sortida, {b} amics han de pagar una despesa de {a} €. Tots hi posen la mateixa quantitat.", "Quants euros paga cadascú?"],
+  ["divide", "📘", ["Pàgines", "Dies"], "T’has compromès a llegir {a} pàgines en {b} dies. Faràs la mateixa quantitat de lectura cada dia.", "Quantes pàgines hauràs de llegir cada dia?"],
+  ["divide", "🧃", ["Sucs", "Sucs per safata"], "Per dur {a} sucs al pati, en poses {b} a cada safata i no n’ha de sobrar cap.", "Quantes safates necessites?"],
+  ["divide", "🌼", ["Flors", "Gerros"], "A la floristeria prepares {a} flors i {b} gerros. Vols posar-hi el mateix nombre de flors a cadascun.", "Quantes flors posaràs a cada gerro?"]
+];
+const valueIndex = {a:0,b:1,c:2,d:3};
+
+function fillProblemStory(pattern,numbers) {
+  return pattern.replace(/\{([a-d])\?([^:}]+):([^}]+)\}|\{([a-d]|list)\}/g,
+    (_,unitAt,singular,plural,value) => {
+      if (unitAt) return numbers[valueIndex[unitAt]] === 1 ? singular : plural;
+      return value === 'list' ? list(numbers) : String(numbers[valueIndex[value]]);
+    });
+}
+
+const extraScenes = extraProblemRows.map(([kind,icon,labels,story,question],index) => ({
+  kind,icon,labels,key:'extra:'+index,
+  wording: numbers => [fillProblemStory(story,numbers),question]
+}));
+specialScenes.push(...extraScenes);
+
+const stepsByKind = {
+  inverse:['subtract'], add:['add'], addMany:['add'], subtract:['subtract'], subtractMany:['subtract'],
+  multiply:['multiply'], divide:['divide'], addTwice:['add','add'],
+  addSubtract:['add','subtract'], multiplyAdd:['multiply','add'],
+  addThree:['add','add','add'], addSubtractAdd:['add','subtract','add'],
+  multiplyAddSubtract:['multiply','add','subtract'],
+  divideAdd:['divide','add'], subtractDivide:['subtract','divide']
+};
+const operationNames = {add:'Suma',subtract:'Resta',multiply:'Multiplicació',divide:'Divisió'};
+const levels = [
+  {name:'Normals',cap:15,maxFactor:10,drawings:true,points:1},
+  {name:'Difícils',cap:15,maxFactor:10,drawings:false,points:2},
+  {name:'Impossible',cap:50,maxFactor:50,drawings:false,points:2},
+  {name:'Master Mode',cap:100,maxFactor:99,drawings:false,points:3}
+];
+const feminine = new Set(['pilotes','pomes','galetes','flors','monedes','maduixes','peces de puzle','pastanagues','magdalenes','llimones','fitxes','ceres','taronges','peres','entrades','plantes','pales','llibretes','patates','petxines','esponges']);
+const bagBySettings = new Map();
+let previousContext = -1;
+let current, stepIndex, problemNumber = 1, score = 0, lives = 3, correctStreak = 0, solved = false;
+const get = id => document.getElementById(id);
+const randomInt = (min,max) => min + Math.floor(Math.random() * (max-min+1));
+const list = numbers => new Intl.ListFormat('ca').format(numbers.map(String));
+const sum = numbers => numbers.reduce((total,n) => total+n,0);
+
+function splitTotal(total, count) {
+  const parts = [];
+  for (let remaining = count; remaining > 1; remaining--) {
+    const part = randomInt(1,total-remaining+1);
+    parts.push(part);
+    total -= part;
+  }
+  return [...parts,total];
+}
+function multiplicationFactors(level, productCap = Infinity) {
+  const {cap,maxFactor} = levels[level];
+  const small = Math.min(10,maxFactor);
+  const first = randomInt(2,Math.min(level === 3 ? maxFactor : small,Math.floor(productCap/2)));
+  const second = randomInt(2,Math.min(maxFactor,cap,Math.floor(productCap/first)));
+  return [first,second];
+}
+function divisionFactors(dividendCap,level) {
+  const divisor = randomInt(2,level === 0 ? 3 : 9);
+  const quotient = randomInt(1,Math.floor(dividendCap/divisor));
+  return [quotient,divisor];
+}
+function quantities(kind, level) {
+  const {cap} = levels[level];
+  if (kind === 'add' || kind === 'addMany' || kind === 'addTwice' || kind === 'addThree') {
+    const count = kind === 'add' ? 2 : kind === 'addTwice' ? 3 : kind === 'addThree' ? 4 : randomInt(3,4);
+    const numbers = splitTotal(randomInt(count,cap),count);
+    return [numbers,sum(numbers)];
+  }
+  if (kind === 'subtract' || kind === 'subtractMany' || kind === 'inverse') {
+    const removed = kind !== 'subtractMany' ? [randomInt(1,cap-1)] : splitTotal(randomInt(2,cap-1),2);
+    const initial = randomInt(sum(removed)+1,cap);
+    return [[initial,...removed],initial-sum(removed)];
+  }
+  if (kind === 'multiply') {
+    const [a,b] = multiplicationFactors(level);
+    return [[a,b],a*b];
+  }
+  if (kind === 'divide') {
+    const [a,b] = divisionFactors(cap,level);
+    return [[a*b,b],a];
+  }
+  if (kind === 'divideAdd' || kind === 'subtractDivide') {
+    const [a,b] = divisionFactors(cap-1,level);
+    if (kind === 'divideAdd') {
+      const extra = randomInt(1,cap-a);
+      return [[a*b,b,extra],a+extra];
+    }
+    const kept = randomInt(1,cap-a*b);
+    return [[a*b+kept,kept,b],a];
+  }
+  if (kind === 'addSubtractAdd') {
+    const [a,b,d] = splitTotal(randomInt(4,cap),3);
+    const c = randomInt(1,a+b);
+    return [[a,b,c,d],a+b-c+d];
+  }
+  if (kind === 'addSubtract') {
+    const [a,b] = splitTotal(randomInt(3,cap),2);
+    const c = randomInt(1,a+b);
+    return [[a,b,c],a+b-c];
+  }
+  const [a,b] = multiplicationFactors(level,level === 3 ? Infinity : cap-1);
+  const c = randomInt(1,level === 3 ? cap : cap-a*b);
+  const total = a*b+c;
+  if (kind === 'multiplyAddSubtract') {
+    const d = randomInt(1,Math.min(cap,total));
+    return [[a,b,c,d],total-d];
+  }
+  return [[a,b,c],total];
+}
+function problemChoices(division,mixed) {
+  const kinds = Object.keys(stepsByKind).filter(kind =>
+    (stepsByKind[kind].length > 1) === Boolean(mixed) && (division || !stepsByKind[kind].includes('divide')));
+  const ordinary = kinds.flatMap(kind => templates[kind].flatMap((_,templateIndex) =>
+    contexts.map((_,contextIndex) => ({kind,templateIndex,contextIndex,key:kind + ':' + templateIndex}))));
+  const special = specialScenes.flatMap((scene,index) => kinds.includes(scene.kind) ?
+    [{kind:scene.kind,contextIndex:contexts.length+index,scene,key:scene.key ?? scene.wording.toString()}] : []);
+  return {ordinary,special};
+}
+
+function chooseTemplate(level, division, mixed) {
+  const key = JSON.stringify([level,division,mixed]);
+  let bag = bagBySettings.get(key);
+  if (!bag?.length) {
+    const {ordinary,special} = problemChoices(division,mixed);
+    bag = [...ordinary,...special,...special,...special,...special,...special];
+    bagBySettings.set(key,bag);
+  }
+  const candidates = bag.filter(item => item.contextIndex !== previousContext);
+  const available = candidates.length ? candidates : bag;
+  const chosen = available[randomInt(0,available.length-1)];
+  bag.splice(bag.indexOf(chosen),1);
+  previousContext = chosen.contextIndex;
+  return chosen;
+}
+function clearFeedback() {
+  get('feedback').textContent = '';
+  get('feedback').removeAttribute('data-kind');
+}
+function makeElement(tag, className, content) {
+  const element = document.createElement(tag);
+  element.className = className;
+  if (content !== undefined) element.textContent = content;
+  return element;
+}
+
+function quantityCard(icon, count, label = '') {
+  const card = makeElement('div','quantity');
+  if (label) card.append(makeElement('div','quantity-label',label));
+  const tens = count > 20 ? Math.floor(count / 10) : 0;
+  if (tens) {
+    const bundles = makeElement('div','bundles');
+    for (let index = 0; index < tens; index++) {
+      bundles.append(makeElement('span','bundle',icon + ' × 10'));
+    }
+    card.append(bundles);
+  }
+  const objects = makeElement('div','objects');
+  for (let index = 0; index < count - tens * 10; index++) {
+    objects.append(makeElement('span','object',icon));
+  }
+  if (objects.childElementCount) card.append(objects);
+  return card;
+}
+
+function drawProblem(icon, kind, templateIndex, numbers, recipients, target = get('picture'), context = []) {
+  const [first,second,third,fourth] = numbers;
+  const [objectName, , boxes] = context;
+  const namedObjects = objectName ? itemHeading(objectName) : 'Import';
+  let cards;
+  if (kind === 'inverse') {
+    cards = [
+      quantityCard(icon,first,'Total'),
+      quantityCard(icon,second,['L’Alícia','Primera bossa','Primer grup'][templateIndex] ?? 'Part coneguda')
+    ];
+  } else if (kind.startsWith('multiply')) {
+    const containerIcons = {
+      caixes:'📦', cistelles:'🧺', prestatges:'🗄️', estoigs:'✏️', plats:'🍽️', gerros:'🏺',
+      calaixos:'🗄️', bosses:'🛍️', bols:'🥣', safates:'🍽️', capses:'📦', pots:'🫙'
+    };
+    const groupLabel = kind === 'multiply'
+      ? [boxes ? itemHeading(container[boxes]) : 'Grup','Grup','Dia'][templateIndex]
+      : ['Capsa','Taula'][templateIndex];
+    const groupIcon = kind === 'multiply'
+      ? [containerIcons[boxes] ?? '📦','👥','📅'][templateIndex]
+      : ['📦','🪑'][templateIndex];
+    const groupPlural = {Capsa:'capses',Taula:'taules',Grup:'grups',Dia:'dies'}[groupLabel] ?? boxes;
+    const distinctGroupIcon = groupIcon === icon ? '🗂️' : groupIcon;
+    cards = [quantityCard(icon,second,groupLabel === 'Dia' ? 'Cada dia' : 'A cada '+groupLabel.toLocaleLowerCase('ca')),
+      quantityCard(distinctGroupIcon,first,itemHeading(groupPlural))];
+    if (third !== undefined) cards.push(quantityCard(icon,third,'Afegits'));
+    if (fourth !== undefined) cards.push(quantityCard(icon,fourth,'Retirats'));
+  } else if (kind === 'divideAdd') {
+    cards = [quantityCard(icon,first,'Total'),quantityCard('👤',second,'Grups'),quantityCard(icon,third,'Afegits a cada grup')];
+  } else if (kind === 'subtractDivide') {
+    cards = [quantityCard(icon,first,'Total'),quantityCard(icon,second,'Guardats'),quantityCard('👤',third,'Persones')];
+  } else if (kind === 'divide') {
+    cards = [quantityCard(icon,first,'Total')];
+    if (templateIndex === 1) {
+      cards.push(quantityCard(icon,second,'A cada bossa'));
+    } else {
+      const receivingGroups = templateIndex === 2 ? 'persones' : recipients;
+      cards.push(quantityCard('👤',second,receivingGroups));
+    }
+  } else {
+    let labels = [];
+    if (kind === 'subtractMany' || (kind === 'subtract' && templateIndex < 2)) {
+      labels = ['Al principi','Que es treuen','Que es treuen'];
+    } else if ((kind === 'addSubtract' || kind === 'addSubtractAdd')) {
+      const firstLabel = templateIndex === 0 ? 'Al principi' : kind === 'addSubtractAdd' ? 'Al principi' : 'A la motxilla';
+      const secondLabel = templateIndex === 0 ? 'Afegits' : kind === 'addSubtractAdd' ? 'Comprats' : 'A la bossa';
+      labels = [firstLabel,secondLabel,'Que es treuen','Afegits'];
+    } else if (kind === 'add' && templateIndex === 2) {
+      labels = ['Una bossa','Una altra bossa'];
+    }
+    if (kind === 'add' && templateIndex === 0) labels = ['Al principi','Que arriben'];
+    if (kind === 'add' && templateIndex === 1) labels = ['L’Aina','En Biel'];
+    if (kind === 'add' && templateIndex === 3) labels = ['Al matí','A la tarda'];
+    if (kind === 'subtract' && templateIndex === 2) labels = ['En Marc','La Júlia'];
+    if (kind === 'subtract' && templateIndex === 3) labels = ['Necessaris','Que ja tens'];
+    if (kind === 'addMany') labels = numbers.map(() => templateIndex === 0 ? 'Caixa' : 'Grup');
+    if (kind === 'addTwice') labels = templateIndex === 0 ? ['Al principi','Al matí','A la tarda'] : ['Que ja tens','La Jana','En Pol'];
+    if (kind === 'addThree') labels = templateIndex === 0 ? ['Al principi','Afegits','Afegits','Afegits'] : ['Que ja tens','La Paula','En Marc','La Jana'];
+    cards = numbers.map((count,index) => quantityCard(icon,count,labels[index] ?? namedObjects));
+  }
+  target.replaceChildren(...cards);
+}
+
+const bonusInterval = 4;
+
+function updateScoreboard() {
+  get('score').textContent = score === 1 ? '1 punt' : score + ' punts';
+  get('hearts').replaceChildren(...Array.from({length:3},(_,index) =>
+    makeElement('span',index < lives ? 'heart heart-live' : 'heart',index < lives ? '♥' : '♡')));
+  get('life-count').textContent = lives === 1 ? '1 vida' : lives + ' vides';
+}
+
+const embeddedArchery = "\u003c!doctype html>\n\u003chtml lang=\"ca\">\n\u003cmeta charset=\"utf-8\">\n\u003cmeta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n\u003ctitle>Tir amb arc\u003c/title>\n\u003cstyle>\n:root{color-scheme:dark;color:#fff4d9;background:#152927;font:16px/1.45 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{width:min(1080px,100% - 24px);margin:24px auto}header,.controls,.readout{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}h1{font:normal clamp(2.4rem,7vw,4.5rem)/1 Georgia,serif;margin:0}p{margin:8px 0 14px;color:#d3e0ce}button{font:700 1rem system-ui;padding:11px 16px;min-height:46px;border-radius:12px;border:1px solid #53786d;background:#243d36;color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #ffe7a9;outline-offset:3px}button:disabled{opacity:.62;cursor:default}#action{background:#ffd68c;color:#302315;border-color:transparent;min-width:165px}#game{width:100%;aspect-ratio:900/410;display:block;border-radius:17px;border:1px solid #547c69;touch-action:none;cursor:crosshair;background:#8cbea4}.meter{height:13px;background:#314b41;border-radius:20px;overflow:hidden;margin:5px 0 10px}.meter div{height:100%;background:linear-gradient(90deg,#b4e3ac,#ffda86 67%,#ff8a72);width:0}.readout{margin-top:10px;font-variant-numeric:tabular-nums;color:#d3e0ce}#status{min-height:1.5em;margin:10px 0}#lives{color:#ff9e9d;letter-spacing:.11em;font-size:1.23rem}.hud{text-align:right}.controls label{display:flex;align-items:center;gap:7px}input{accent-color:#ffd68c;width:105px}#round{color:#d3e0ce;font-size:.9rem}@media(max-width:580px){main{margin-top:14px}.controls{gap:8px}#action{min-width:0;flex:1}.controls label{order:3;width:100%}input{flex:1}#game{aspect-ratio:900/490}}\nmain{margin:12px auto}h1{font-size:clamp(1.7rem,5vw,2.8rem)}#game{max-height:49vh;min-height:170px}\u003c/style>\n\u003cmain>\n\u003cheader>\u003ch1>Tir amb arc\u003c/h1>\u003cdiv class=\"hud\">\u003cstrong id=\"score\">0 punts\u003c/strong>\u003cbr>\u003cspan id=\"lives\">\u003c/span>\u003cbr>\u003cspan id=\"round\">\u003c/span>\u003c/div>\u003c/header>\n\u003cp>Apunta, fes clic per fixar l\u2019angle i torna a clicar per disparar. Tens tres fletxes. Cada diana encertada suma punts i el cor recupera una vida.\u003c/p>\n\u003ccanvas id=\"game\" tabindex=\"0\" aria-label=\"Camp de tir amb tres dianes. Usa el ratol\u00ed o el control d\u2019angle per apuntar.\">\u003c/canvas>\n\u003cdiv class=\"readout\">\u003cspan id=\"angleText\">\u003c/span>\u003cspan id=\"powerText\">Pot\u00e8ncia\u003c/span>\u003c/div>\n\u003cdiv class=\"meter\" aria-hidden=\"true\">\u003cdiv id=\"fill\">\u003c/div>\u003c/div>\n\u003cdiv class=\"controls\">\u003cbutton id=\"action\">Fixa l\u2019angle\u003c/button>\u003clabel for=\"angle\">Angle \u003cinput id=\"angle\" type=\"range\" min=\"-12\" max=\"76\" value=\"29\">\u003c/label>\u003c/div>\n\u003cp id=\"status\" role=\"status\">\u003c/p>\n\u003c/main>\n\u003cscript>\n'use strict';\nconst $=id=>document.getElementById(id);\nconst field=$('game'), ctx=field.getContext('2d');\nconst WIDTH=900, HEIGHT=410, GROUND=350, GRAVITY=270;\nconst MAX_LIVES=3, SHOTS=3, HEART_SCALE=.64;\nconst levels=[\n  {stand:0, targets:[[268,272],[505,253],[748,234]], wall:null},\n  {stand:37,targets:[[280,296],[514,228],[752,275]],wall:{x:393,w:47,top:276}},\n  {stand:0,targets:[[271,232],[526,283],[753,202]],wall:{x:366,w:55,top:252}},\n  {stand:60,targets:[[273,285],[520,199],[751,250]],wall:{x:419,w:44,top:237}},\n  {stand:19,targets:[[292,245],[542,182],[759,289]],wall:{x:368,w:54,top:274}}\n];\nconst clamp=(v,min,max)=>Math.max(min,Math.min(max,v));\nconst radians=degrees=>degrees*Math.PI/180;\nlet lane, stage, targets, score, lives, mode, angle, powerStart, arrow, lastArrow, heartShot, heartStart, shotNumber, previousTime;\nlet viewScale=1, viewX=0, viewY=0;\nlet notice='';\nfunction origin(){return {x:91,y:GROUND-lane.stand-54}}\nfunction layout(){\n  lane=levels[stage%levels.length];\n  targets=lane.targets.map(([x,y],i)=>({x,y,r:[20,23,25][i],points:[1,3,10][i],hit:false}));\n  lastArrow=null;\n}\nfunction reset(now=performance.now()){\n  stage=Math.floor(Math.random()*levels.length);\n  score=0;\n  lives=clamp(__INITIAL_LIVES__ || MAX_LIVES,1,MAX_LIVES);\n  angle=29;mode='aim';arrow=null;notice='';\n  shotNumber=1;\n  heartShot=1+Math.floor(Math.random()*SHOTS);\n  heartStart=now;\n  layout();\n  $('angle').value=angle;\n  setStatus('Apunta a qualsevol de les tres dianes.');\n  renderControls();\n}\nfunction setStatus(message){$('status').textContent=message}\nfunction renderControls(){\n  $('score').textContent=score+(score===1?' punt':' punts');\n  $('lives').textContent='\u2665'.repeat(lives)+'\u2661'.repeat(Math.max(0,MAX_LIVES-lives));\n  $('lives').setAttribute('aria-label',lives+' vides');\n  $('round').textContent='Fletxes '+Math.max(0,SHOTS-shotNumber+1)+'/'+SHOTS;\n  $('angleText').textContent='Angle '+Math.round(angle)+'\u00b0';\n  $('angle').disabled=mode!=='aim';\n  $('action').textContent={aim:'Fixa l\u2019angle',charge:'Dispara',flight:'Fletxa en vol',over:'Repte acabat'}[mode];\n  $('action').disabled=mode==='flight'||mode==='over';\n}\nfunction powerAt(now){\n  const phase=((now-powerStart)/1350)%2;\n  return phase\u003c=1?phase:2-phase;\n}\nfunction speedAt(power){return 24+746*power}\nfunction pointAt(shot,t){\n  return {x:shot.x+shot.vx*t,y:shot.y+shot.vy*t+GRAVITY*t*t/2};\n}\nfunction action(now=performance.now()){\n  if(mode==='over')return;\n  if(mode==='aim'){\n    powerStart=now;mode='charge';\n    setStatus('Torna a clicar per disparar.');\n  }else if(mode==='charge'){\n    const power=powerAt(now), speed=speedAt(power), direction=radians(angle);\n    const start=origin();\n    arrow={...start,vx:speed*Math.cos(direction),vy:-speed*Math.sin(direction),started:now,t:0,power};\n    lastArrow=null;mode='flight';\n    setStatus('La fletxa vola\u2026');\n  }\n  renderControls();\n}\nfunction positionHeart(now){\n  if(shotNumber!==heartShot||mode==='over')return null;\n  const phase=Math.max(0,(now-heartStart)/1000);\n  return {x:851+30*Math.sin(phase*4.8),y:92+17*Math.sin(phase*6.2+1)};\n}\nfunction hitCircle(point,target){return Math.hypot(point.x-target.x,point.y-target.y)\u003c=target.r}\nfunction hitHeart(point,target){\n  const dx=(point.x-target.x)/(1.07*HEART_SCALE),dy=(point.y-target.y)/HEART_SCALE;\n  return Math.hypot(Math.abs(dx)-8,dy+4)\u003c=9 || (dy>=-2 && Math.abs(dx)+dy\u003c19);\n}\nfunction collision(point,bonus){\n  if(lane.wall && point.x>=lane.wall.x && point.x\u003c=lane.wall.x+lane.wall.w && point.y>=lane.wall.top)return {kind:'wall'};\n  if(point.y>=GROUND)return {kind:'ground'};\n  if(bonus&&hitHeart(point,bonus))return {kind:'heart'};\n  const target=targets.find(item=>!item.hit&&hitCircle(point,item));\n  if(target)return {kind:'target',target};\n  if(point.x>WIDTH+3)return {kind:'wide'};\n  return null;\n}\nfunction settle(hit,point,now,t){\n  lastArrow={...point, tilt:Math.atan2(arrow.vy+GRAVITY*t,arrow.vx)};\n  arrow=null;\n  let points=0, life=0;\n  if(hit.kind==='target'){\n    hit.target.hit=true;\n    points=hit.target.points;\n    score+=points;\n    notice='+'+points+(points===1?' punt.':' punts.');\n  }else if(hit.kind==='heart'){\n    life=lives\u003cMAX_LIVES?1:0;\n    lives+=life;\n    notice=life?'Has recuperat una vida!':'Ja tens totes les vides.';\n  }else{\n    notice={wall:'Has topat amb l\u2019obstacle.',ground:'La fletxa ha caigut a terra.',wide:'La fletxa ha sortit del camp.'}[hit.kind];\n  }\n  window.parent.postMessage({type:'tir-resultat',shot:shotNumber,points,life},'*');\n  shotNumber++;\n  if(shotNumber===heartShot)heartStart=now;\n  mode=shotNumber\u003c=SHOTS?'aim':'over';\n  setStatus(notice+(mode==='aim'?' Ja pots tornar a apuntar.':' Repte acabat. Has sumat '+score+' punts.'));\n  renderControls();\n}\nfunction updateFlight(now){\n  if(!arrow)return;\n  const finalTime=(now-arrow.started)/1000;\n  while(arrow.t\u003cfinalTime){\n    const t=Math.min(finalTime,arrow.t+1/240);\n    const point=pointAt(arrow,t);\n    const impact=collision(point,positionHeart(arrow.started+t*1000));\n    if(impact){settle(impact,point,now,t);return}\n    arrow.t=t;\n  }\n}\nfunction aimFromPointer(event){\n  if(mode!=='aim')return;\n  const rect=field.getBoundingClientRect(), start=origin();\n  const x=(event.clientX-rect.left-viewX)/viewScale;\n  const y=(event.clientY-rect.top-viewY)/viewScale;\n  angle=clamp(Math.atan2(start.y-y,Math.max(20,x-start.x))*180/Math.PI,-12,76);\n  $('angle').value=Math.round(angle);\n  $('angleText').textContent='Angle '+Math.round(angle)+'\u00b0';\n}\nfield.addEventListener('pointerdown',event=>{\n  if(!event.isPrimary||event.button!==0)return;\n  aimFromPointer(event);\n  field.setPointerCapture(event.pointerId);\n});\nfield.addEventListener('pointermove',aimFromPointer);\nfield.addEventListener('pointerup',event=>{\n  if(!event.isPrimary||event.button!==0)return;\n  aimFromPointer(event);\n  action();\n});\nfield.addEventListener('keydown',event=>{\n  if(event.code==='Space'||event.code==='Enter'){event.preventDefault();if(!event.repeat)action()}\n});\n$('angle').oninput=event=>{\n  angle=Number(event.target.value);\n  $('angleText').textContent='Angle '+angle+'\u00b0';\n};\n$('action').onclick=()=>action();\nfunction circle(x,y,r,color){\n  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();\n}\nfunction line(x,y,x2,y2,color,width=2){\n  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.stroke();\n}\nfunction rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}\nfunction label(text,x,y,color,size=16){\n  ctx.fillStyle=color;ctx.font='700 '+size+'px system-ui';ctx.textAlign='center';ctx.fillText(text,x,y);\n}\nfunction mountain(color,points){\n  ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,GROUND);\n  points.forEach(([x,y])=>ctx.lineTo(x,y));\n  ctx.lineTo(WIDTH,GROUND);ctx.closePath();ctx.fill();\n}\nfunction landscape(){\n  const sky=ctx.createLinearGradient(0,0,0,GROUND);\n  sky.addColorStop(0,'#75a99d');sky.addColorStop(1,'#f1dba6');\n  rect(0,0,WIDTH,HEIGHT,sky);\n  circle(766,72,33,'#ffe5a9');\n  mountain('#8aad92',[[0,214],[111,146],[226,226],[325,163],[493,249],[614,157],[746,204],[861,130],[900,161]]);\n  mountain('#628e77',[[0,278],[156,235],[271,288],[439,229],[568,293],[739,236],[900,267]]);\n  rect(0,GROUND,WIDTH,HEIGHT-GROUND,'#324f40');\n  rect(0,GROUND,WIDTH,5,'#acc386');\n  for(let i=0;i\u003c35;i++){\n    const x=i*27+5,y=365+(i*13)%35;\n    line(x,y,x+8,y-3,'#496653',2);\n  }\n  if(lane.stand){\n    rect(38,GROUND-lane.stand,100,lane.stand,'#5d513c');\n    rect(35,GROUND-lane.stand,106,6,'#c4a774');\n  }\n  if(lane.wall){\n    const {x,w,top}=lane.wall;\n    rect(x,top,w,GROUND-top,'#5d5848');\n    rect(x,top,w,6,'#b4a486');\n    for(let y=top+20;y\u003cGROUND;y+=17)line(x+2,y,x+w-2,y,'#8a7e68');\n  }\n}\nfunction drawTarget(target){\n  const {x,y,r,points,hit}=target;\n  line(x,y,x-13,GROUND,'#564b34',5);\n  line(x,y,x+13,GROUND,'#655136',5);\n  if(hit){\n    circle(x,y,r,'#526d55');label('\u2713',x,y+7,'#d9e4b8',23);return;\n  }\n  circle(x,y,r+3,'#503c37');\n  circle(x,y,r,'#fff0cc');\n  circle(x,y,r*.76,'#bd493d');\n  circle(x,y,r*.51,'#fff0cc');\n  circle(x,y,r*.31,'#dc8b39');\n  rect(x-17,y-r-32,34,23,'#273d32');\n  label('+'+points,x,y-r-15,'#fff2ce',15);\n}\nfunction drawHeart(bonus){\n  const {x,y}=bonus;\n  ctx.save();ctx.translate(x,y);ctx.scale(1.07*HEART_SCALE,HEART_SCALE);\n  ctx.fillStyle='#ed6377';ctx.strokeStyle='#fff0ce';ctx.lineWidth=2.5;ctx.beginPath();\n  ctx.moveTo(0,19);\n  ctx.bezierCurveTo(-4,14,-18,6,-17,-5);\n  ctx.bezierCurveTo(-17,-14,-6,-17,0,-8);\n  ctx.bezierCurveTo(6,-17,17,-14,17,-5);\n  ctx.bezierCurveTo(18,6,4,14,0,19);\n  ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();\n  label('+1 vida',x,y-16,'#402a31',13);\n}\nfunction drawArrow(point,tilt){\n  ctx.save();ctx.translate(point.x,point.y);ctx.rotate(tilt);\n  line(-29,0,-3,0,'#fff1c8',2.6);\n  line(-7,-3,0,0,'#4b3128',2);\n  line(-7,3,0,0,'#4b3128',2);\n  line(-30,-3,-24,0,'#e48760',2);\n  line(-30,3,-24,0,'#e48760',2);\n  ctx.restore();\n}\nfunction drawArcher(){\n  const start=origin(), direction=-radians(angle), x=start.x-24, y=start.y;\n  line(x,y+3,x-4,y+31,'#253832',13);\n  line(x-4,y+28,x-16,y+52,'#253832',7);\n  line(x-4,y+28,x+10,y+52,'#253832',7);\n  circle(x-1,y-12,9,'#e6ae79');\n  line(x-10,y-17,x+9,y-17,'#40513a',5);\n  line(x-1,y+5,start.x,start.y,'#40513a',7);\n  ctx.save();ctx.translate(start.x,start.y);ctx.rotate(direction);\n  ctx.beginPath();ctx.moveTo(-6,-17);ctx.quadraticCurveTo(19,0,-6,17);\n  ctx.strokeStyle='#774b31';ctx.lineWidth=4;ctx.stroke();\n  line(-6,-17,mode==='charge'?-14:-6,0,'#fff1c8',1.4);\n  line(mode==='charge'?-14:-6,0,-6,17,'#fff1c8',1.4);\n  ctx.restore();\n  if(mode==='aim'||mode==='charge'){\n    drawArrow({x:start.x+Math.cos(direction)*24,y:start.y+Math.sin(direction)*24},direction);\n    for(let i=1;i\u003c=5;i++){\n      const d=35+i*11;\n      circle(start.x+Math.cos(direction)*d,start.y+Math.sin(direction)*d,2.4,'#fff6d7');\n    }\n  }\n}\nfunction render(now){\n  const w=field.clientWidth,h=field.clientHeight,dpr=Math.min(window.devicePixelRatio||1,2);\n  const pixelWidth=Math.round(w*dpr),pixelHeight=Math.round(h*dpr);\n  if(field.width!==pixelWidth||field.height!==pixelHeight){field.width=pixelWidth;field.height=pixelHeight}\n  viewScale=Math.min(w/WIDTH,h/HEIGHT)||1;\n  viewX=(w-WIDTH*viewScale)/2;viewY=(h-HEIGHT*viewScale)/2;\n  ctx.setTransform(dpr,0,0,dpr,0,0);\n  rect(0,0,w,h,'#263d37');\n  ctx.setTransform(viewScale*dpr,0,0,viewScale*dpr,viewX*dpr,viewY*dpr);\n  ctx.save();ctx.beginPath();ctx.rect(0,0,WIDTH,HEIGHT);ctx.clip();\n  landscape();\n  targets.forEach(drawTarget);\n  const bonus=positionHeart(now);\n  if(bonus)drawHeart(bonus);\n  drawArcher();\n  if(arrow)drawArrow(pointAt(arrow,arrow.t),Math.atan2(arrow.vy+GRAVITY*arrow.t,arrow.vx));\n  if(lastArrow)drawArrow(lastArrow,lastArrow.tilt);\n  ctx.restore();\n  const power=mode==='charge'?powerAt(now):arrow?.power;\n  $('fill').style.width=power===undefined?'0%':Math.round(power*100)+'%';\n  $('powerText').textContent=power===undefined?'Pot\u00e8ncia':'Pot\u00e8ncia '+Math.round(power*100)+'%';\n}\nfunction frame(now){\n  if(previousTime!==undefined && now-previousTime>1200 && mode!=='over'){\n    const pause=now-previousTime;\n    heartStart+=pause;\n    if(arrow)arrow.started+=pause;\n    if(mode==='charge')powerStart+=pause;\n  }\n  previousTime=now;\n  if(mode!=='over'){\n    updateFlight(now);\n  }\n  render(now);\n  requestAnimationFrame(frame);\n}\nreset();\nrequestAnimationFrame(frame);\n\u003c/script>\n\u003c/html>";
+
+let bonusFrame;
+let bonusShots;
+let bonusTargets;
+let bonusRestoredLife;
+
+function openBonus() {
+  bonusShots = new Set();
+  bonusTargets = new Set();
+  bonusRestoredLife = false;
+  bonusFrame = document.createElement('iframe');
+  bonusFrame.title = 'Minijoc de tir amb arc';
+  bonusFrame.srcdoc = embeddedArchery.replace('__INITIAL_LIVES__',String(lives));
+  get('bonus-frame').replaceChildren(bonusFrame);
+  get('bonus-dialog').showModal();
+  get('bonus-continue').focus();
+}
+
+function checkStreak() {
+  correctStreak++;
+  if (correctStreak < bonusInterval) return false;
+  correctStreak = 0;
+  return true;
+}
+
+window.addEventListener('message',event => {
+  if (!bonusFrame || event.source !== bonusFrame.contentWindow) return;
+  const result = event.data;
+  if (result?.type !== 'tir-resultat' || ![1,2,3].includes(result.shot) || bonusShots.has(result.shot)) return;
+  bonusShots.add(result.shot);
+  if ([1,3,10].includes(result.points) && !bonusTargets.has(result.points)) {
+    bonusTargets.add(result.points);
+    score += result.points;
+  }
+  if (result.life === 1 && !bonusRestoredLife) {
+    bonusRestoredLife = true;
+    lives = Math.min(3,lives+1);
+  }
+  updateScoreboard();
+});
+
+get('bonus-continue').addEventListener('click',() => get('bonus-dialog').close());
+get('bonus-dialog').addEventListener('close',() => {
+  bonusFrame = undefined;
+  get('bonus-frame').replaceChildren();
+  if (solved) advance();
+  else if (!get('form').hidden) get('answer').focus();
+});
+
+function drawingIcon(label,fallback) {
+  const roles = [
+    [/safates|plats/, '🍽️'], [/testos|viver/, '🪴'], [/rodes|voltes/, '◯'],
+    [/conills/,'🐇'], [/gerros/,'🏺'], [/caixes|capses/,'📦'],
+    [/famílies|amics|equips/, '👥'], [/dies|rondes/, '📅'], [/pots/, '🫙'],
+    [/cistells/, '🧺'], [/prestatges/, '🗄️'], [/galetes/, '🍪'], [/llibres|pàgines/, '📚'],
+    [/sobres/, '✉️'], [/entrades/, '🎟️'], [/taules/, '🪑'], [/per bossa|bosses/, '🛍️'],
+    [/llimones/, '🍋'], [/pomes/, '🍎'], [/panets/, '🥖'], [/flors/, '🌼'],
+    [/sucs/, '🧃'], [/estoigs/, '✏️'], [/punt|peces|bales|adhesius/, '🔹']
+  ];
+  return roles.find(([pattern]) => pattern.test(label.toLocaleLowerCase('ca')))?.[1] ?? fallback;
+}
+
+function drawExtraScene(scene,numbers,target) {
+  const icons = numbers.map((_,index) => drawingIcon(scene.labels[index],scene.icon));
+  if (scene.kind.startsWith('multiply') && icons[0] === icons[1]) icons[0] = '🔸';
+  const cards = numbers.map((count,index) => quantityCard(icons[index],count,scene.labels[index]));
+  if (scene.kind.startsWith('multiply')) {
+    [cards[0],cards[1]] = [cards[1],cards[0]];
+  }
+  target.replaceChildren(...cards);
+}
+
+function drawScene(scene,numbers,target = get('picture')) {
+  if (scene.key?.startsWith('extra:')) {
+    drawExtraScene(scene,numbers,target);
+    return;
+  }
+  if (scene.values === clockTimes) {
+    const [a,b] = numbers;
+    const clockFace = hour => String.fromCodePoint(0x1f550 + ((hour+11)%12));
+    const start = scene.kind === 'add' ? a : b;
+    const first = quantityCard(clockFace(start),1,'Hora d’inici');
+    const second = scene.kind === 'add' ? quantityCard('⏳',b,'Durada') : quantityCard(clockFace(a),1,'Hora de final');
+    target.replaceChildren(first,second);
+    return;
+  }
+  if (scene.kind === 'multiply' || scene.kind === 'multiplyAdd') {
+    const [count,unitPrice,extra] = numbers;
+    const cards = [quantityCard('💶',unitPrice,scene.labels[0]),
+      quantityCard(scene.icon,count,scene.kind === 'multiplyAdd' ? 'Llibretes' : 'Unitats')];
+    if (extra !== undefined) cards.push(quantityCard('💶',extra,scene.labels[1]));
+    target.replaceChildren(...cards);
+    return;
+  }
+  if (scene.kind === 'divide') {
+    drawProblem(scene.group,scene.kind,0,numbers,'persones',target);
+    return;
+  }
+  const labels = scene.labels ?? (scene.kind === 'inverse' ? ['Total','Pagat'] :
+    scene.kind === 'subtract' ? ['Tens','Gastes'] :
+    scene.kind === 'addSubtract' ? ['Primer càrrec','Segon càrrec','Pagat'] : scene.kind === 'addTwice' ? ['Al matí','Abans de sopar','Després de sopar'] : ['Primer dia','Segon dia']);
+  target.replaceChildren(...numbers.map((count,index) =>
+    quantityCard(scene.group,count,labels[index] ?? (scene.group === '💶' ? 'Preu' : 'Temps'))));
+}
+
+function presentQuestion(question,presentation) {
+  if (presentation === 0) return question;
+  const indirect = question.replace(/\?/,'.');
+  const lead = presentation === 1 ? 'Calcula' : 'Escriu';
+  return lead+' '+indirect[0].toLocaleLowerCase('ca')+indirect.slice(1);
+}
+
+function buildProblem(choice,level,presentation = randomInt(0,2)) {
+  const {kind,templateIndex,contextIndex,scene} = choice;
+  const [icon,...context] = scene ? [scene.icon] : contexts[contextIndex];
+  const [numbers,answer] = (scene?.values ?? quantities)(kind,level);
+  const [rawStory,rawQuestion] = scene ? scene.wording(numbers) : templates[kind][templateIndex](numbers,...context);
+  const story = rawStory.replace(/\ba el (?=\p{L})/giu, match => match.startsWith('A') ? 'Al ' : 'al ');
+  const naturalQuestion = feminine.has(context[0]) ? rawQuestion.replace(/^Quants/, 'Quantes') : rawQuestion;
+  const question = presentQuestion(naturalQuestion,presentation);
+  return {kind,templateIndex,scene,icon,numbers,answer,story,question,presentation,recipients:context[3],context,level,steps:stepsByKind[kind]};
+}
+
+function drawGroups(problem,target) {
+  const {scene,numbers,icon,kind,templateIndex,recipients,context} = problem;
+  if (scene) drawScene(scene,numbers,target);
+  else drawProblem(icon,kind,templateIndex,numbers,recipients,target,context);
+}
+
+function showProblem(focus = false) {
+  const level = Number(document.querySelector('[name=level]:checked').value);
+  current = buildProblem(chooseTemplate(level,get('division').checked,get('mixed').checked),level);
+  solved = false;
+  stepIndex = 0;
+  get('form').hidden = true;
+  get('gameover').hidden = true;
+  get('operation-step').hidden = false;
+  get('operation-label').textContent = current.steps.length === 1 ? 'Quina operació faràs?' : 'Quina operació faràs primer?';
+  get('watermark').textContent = current.icon;
+  const drawings = levels[level].drawings;
+  get('picture').hidden = !drawings;
+  get('challenge').classList.toggle('with-groups',drawings);
+  if (drawings) drawGroups(current,get('picture'));
+  else get('picture').replaceChildren();
+  const statement = get('statement');
+  const fields = current.presentation === 2 ? [get('question'),get('story')] : [get('story'),get('question')];
+  statement.replaceChildren(...fields);
+  statement.classList.toggle('question-first',current.presentation === 2);
+  get('story').textContent = current.story;
+  get('question').textContent = current.question;
+  get('progress').textContent = 'Problema '+problemNumber;
+  get('answer').value = '';
+  get('answer').readOnly = false;
+  get('check').hidden = false;
+  get('skip').hidden = false;
+  clearFeedback();
+  if (focus) get('progress').focus();
+}
+
+function advance() {
+  problemNumber++;
+  showProblem(true);
+}
+
+const feedbackWindow = get('feedback-window');
+feedbackWindow.addEventListener('cancel',event => event.preventDefault());
+
+function showFeedbackWindow(kind,title,detail,onClose) {
+  feedbackWindow.dataset.kind = kind;
+  get('feedback-title').textContent = title;
+  get('feedback-detail').textContent = detail;
+  feedbackWindow.showModal();
+  setTimeout(() => {
+    feedbackWindow.close();
+    onClose();
+  },2000);
+}
+
+function loseLife(message,focusEnd = true) {
+  correctStreak = 0;
+  lives--;
+  updateScoreboard();
+  if (lives > 0) {
+    get('feedback').dataset.kind = 'error';
+    get('feedback').textContent = message;
+    return;
+  }
+  clearFeedback();
+  get('operation-step').hidden = true;
+  get('form').hidden = true;
+  get('skip').hidden = true;
+  get('gameover').hidden = false;
+  const reason = message.split('. ')[0];
+  get('final-score').textContent = reason + '. T’has quedat sense vides. Puntuació final: ' +
+    score + (score === 1 ? ' punt.' : ' punts.');
+  if (focusEnd) get('final-score').focus();
+}
+
+function reportMistake(message,retry = () => {}) {
+  loseLife(message,false);
+  showFeedbackWindow('error','Errada!','Perds una vida!',() => {
+    if (lives) retry();
+    else get('final-score').focus();
+  });
+}
+
+get('operations').addEventListener('click',event => {
+  const button = event.target.closest('[data-op]');
+  if (!button || !lives || feedbackWindow.open || stepIndex >= current.steps.length) return;
+  clearFeedback();
+  if (button.dataset.op !== current.steps[stepIndex]) {
+    reportMistake('Aquesta operació no és correcta. Perds una vida.',() => button.focus());
+    return;
+  }
+  stepIndex++;
+  const bonusReady = checkStreak();
+  if (stepIndex < current.steps.length) {
+    get('operation-label').textContent = stepIndex === 1 ? 'Quina operació faràs després?' : 'Quina és l’última operació?';
+    get('feedback').textContent = 'Operació correcta.';
+    if (bonusReady) openBonus();
+    return;
+  }
+  get('chosen').textContent = current.steps.map(op => operationNames[op]).join(' → ');
+  get('operation-step').hidden = true;
+  get('form').hidden = false;
+  get('answer').focus();
+  if (bonusReady) openBonus();
+});
+
+get('form').addEventListener('submit',event => {
+  event.preventDefault();
+  if (!lives || solved || feedbackWindow.open || stepIndex !== current.steps.length) return;
+  const field = get('answer');
+  const value = field.value.trim();
+  if (!/^\d+$/.test(value)) {
+    get('feedback').dataset.kind = 'error';
+    get('feedback').textContent = 'Escriu la resposta amb xifres.';
+    field.focus();
+    return;
+  }
+  if (Number(value) !== current.answer) {
+    reportMistake('Aquest resultat no és correcte. Perds una vida.',() => {
+      field.focus();
+      field.select();
+    });
+    return;
+  }
+  solved = true;
+  const earned = levels[current.level].points;
+  score += earned;
+  const bonusReady = checkStreak();
+  updateScoreboard();
+  get('feedback').dataset.kind = 'ok';
+  get('feedback').textContent = 'Molt bé! +' + earned + (earned === 1 ? ' punt.' : ' punts.');
+  field.readOnly = true;
+  get('check').hidden = true;
+  get('skip').hidden = true;
+  const points = '+' + earned + (earned === 1 ? ' punt' : ' punts');
+  showFeedbackWindow('success','Molt bé!',points,() => {
+    if (bonusReady) openBonus();
+    else advance();
+  });
+});
+
+get('skip').addEventListener('click',() => {
+  const dialog = get('skip-dialog');
+  dialog.returnValue = 'cancel';
+  dialog.showModal();
+});
+get('skip-dialog').addEventListener('close',event => {
+  if (!lives || event.target.returnValue !== 'skip') return;
+  loseLife('Has canviat de problema. Perds una vida.');
+  if (lives) {
+    advance();
+    get('feedback').dataset.kind = 'error';
+    get('feedback').textContent = 'Has perdut una vida en canviar de problema.';
+  }
+});
+get('restart').addEventListener('click',() => {
+  lives = 3;
+  score = 0;
+  correctStreak = 0;
+  problemNumber = 1;
+  bagBySettings.clear();
+  updateScoreboard();
+  showProblem(true);
+});
+document.querySelectorAll('aside input').forEach(input => input.addEventListener('change',() => {
+  if (!lives) return;
+  if (solved) problemNumber++;
+  showProblem();
+}));
+function worksheetOptions() {
+  const level = Number(document.querySelector('[name=level]:checked').value);
+  const {ordinary,special} = problemChoices(get('division').checked,get('mixed').checked);
+  const byTemplate = new Map();
+  for (const choice of [...ordinary,...special]) {
+    if (!byTemplate.has(choice.key)) byTemplate.set(choice.key,[]);
+    byTemplate.get(choice.key).push(choice);
+  }
+  return {level,perPage:levels[level].drawings ? 3 : 4,templates:[...byTemplate.values()]};
+}
+
+function worksheetProblems(options,count) {
+  const remaining = [...options.templates];
+  return Array.from({length:count},() => {
+    const [variants] = remaining.splice(randomInt(0,remaining.length-1),1);
+    return buildProblem(variants[randomInt(0,variants.length-1)],options.level);
+  });
+}
+
+function textLines(ctx,text,width) {
+  const lines = [];
+  let line = '';
+  for (const word of text.split(' ')) {
+    const next = line ? line + ' ' + word : word;
+    if (line && ctx.measureText(next).width > width) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+const pageWidth = 595;
+const pageHeight = 842;
+const renderScale = 2;
+const worksheetFont = '"Comic Sans MS", "Comic Neue", "Chalkboard SE", "Arial Rounded MT Bold", sans-serif';
+
+function printGroups(ctx,problem,x,y,availableWidth) {
+  const target = document.createElement('div');
+  drawGroups(problem,target);
+  let left = x;
+  let rowHeight = 0;
+  for (const card of target.children) {
+    const label = card.querySelector('.quantity-label')?.textContent;
+    const objects = [...card.querySelectorAll('.object')].map(node => node.textContent);
+    const bundles = [...card.querySelectorAll('.bundle')].map(node => node.textContent);
+    ctx.font = 'bold 9px ' + worksheetFont;
+    const objectWidth = Math.min(objects.length,5)*15;
+    const width = Math.max(34,objectWidth,label ? ctx.measureText(label).width : 0,bundles.length*31) + 12;
+    const height = 12 + (label ? 12 : 0) + (bundles.length ? 15 : 0) + Math.ceil(objects.length/5)*15;
+    if (left + width > x + availableWidth && left !== x) {
+      left = x;
+      y += rowHeight + 5;
+      rowHeight = 0;
+    }
+    ctx.fillStyle = '#eef6ef';
+    ctx.fillRect(left,y,width,height);
+    ctx.fillStyle = '#223e32';
+    let top = y + 12;
+    if (label) {
+      ctx.fillText(label,left+6,top);
+      top += 12;
+    }
+    if (bundles.length) {
+      ctx.font = '9px system-ui';
+      bundles.forEach((item,index) => ctx.fillText(item,left+6+index*31,top));
+      top += 15;
+    }
+    ctx.font = '12px system-ui';
+    objects.forEach((item,index) => ctx.fillText(item,left+6+(index%5)*15,top+Math.floor(index/5)*15));
+    left += width+5;
+    rowHeight = Math.max(rowHeight,height);
+  }
+  return y + rowHeight;
+}
+
+async function renderWorksheetPage(problems,options,pageIndex,pageCount) {
+  const canvas = document.createElement('canvas');
+  canvas.width = pageWidth*renderScale;
+  canvas.height = pageHeight*renderScale;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(renderScale,renderScale);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0,0,pageWidth,pageHeight);
+  ctx.fillStyle = '#192d32';
+  ctx.font = 'bold 24px ' + worksheetFont;
+  ctx.fillText('Problemes del dia a dia',34,45);
+  ctx.font = '12px ' + worksheetFont;
+  ctx.fillText('Nom _____________________________    Data ____________',35,69);
+  ctx.fillText(levels[options.level].name + '  ·  ' + (pageIndex+1) + '/' + pageCount,35,88);
+  const slot = (pageHeight-121)/options.perPage;
+  problems.forEach((problem,index) => {
+    const top = 103+index*slot;
+    const number = pageIndex*options.perPage+index+1;
+    ctx.strokeStyle = '#b6c5bf';
+    ctx.lineWidth = 0.75;
+    ctx.strokeRect(34,top,527,slot-8);
+    ctx.save();
+    ctx.globalAlpha = .15;
+    ctx.font = '110px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(problem.icon,445,top+125);
+    ctx.restore();
+    ctx.fillStyle = '#192d32';
+    const text = problem.presentation === 2 ? [[problem.question,true],[problem.story,false]] :
+      [[problem.story,false],[problem.question,true]];
+    let y = top+24;
+    text.forEach(([part,emphasis],sectionIndex) => {
+      ctx.font = (emphasis ? 'bold ' : '') + '15px ' + worksheetFont;
+      for (const line of textLines(ctx,(sectionIndex === 0 ? number + '. ' : '') + part,501)) {
+        ctx.fillText(line,47,y);
+        y += 19;
+      }
+    });
+    if (levels[options.level].drawings) y = printGroups(ctx,problem,47,y-8,501)+13;
+    ctx.strokeStyle = '#c8d0cd';
+    ctx.lineWidth = .6;
+    for (let line = top+slot-23; line > y+7; line -= 24) {
+      ctx.beginPath();
+      ctx.moveTo(47,line);
+      ctx.lineTo(546,line);
+      ctx.stroke();
+    }
+  });
+  const image = await new Promise((resolve,reject) => canvas.toBlob(blob =>
+    blob ? resolve(blob) : reject(new Error('El navegador no ha pogut dibuixar la pàgina.')), 'image/jpeg',.94));
+  return new Uint8Array(await image.arrayBuffer());
+}
+
+function makePdf(images) {
+  const encoder = new TextEncoder();
+  const parts = [];
+  const offsets = [0];
+  let bytes = 0;
+  function append(value) {
+    const chunk = typeof value === 'string' ? encoder.encode(value) : value;
+    parts.push(chunk);
+    bytes += chunk.length;
+  }
+  function object(id,body,stream) {
+    offsets[id] = bytes;
+    append(id+' 0 obj\n'+body);
+    if (stream) {
+      append('\nstream\n');
+      append(stream);
+      append('\nendstream');
+    }
+    append('\nendobj\n');
+  }
+  append('%PDF-1.4\n');
+  object(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  object(2,'<< /Type /Pages /Count '+images.length+' /Kids ['+
+    images.map((_,index)=>(3+index*3)+' 0 R').join(' ')+'] >>');
+  const commands = encoder.encode('q\n'+pageWidth+' 0 0 '+pageHeight+' 0 0 cm\n/Im0 Do\nQ\n');
+  images.forEach((image,index) => {
+    const id = 3+index*3;
+    object(id,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pageWidth+' '+pageHeight+
+      '] /Resources << /XObject << /Im0 '+(id+1)+' 0 R >> >> /Contents '+(id+2)+' 0 R >>');
+    object(id+1,'<< /Type /XObject /Subtype /Image /Width '+pageWidth*renderScale+
+      ' /Height '+pageHeight*renderScale+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+image.length+' >>',image);
+    object(id+2,'<< /Length '+commands.length+' >>',commands);
+  });
+  const xref = bytes;
+  append('xref\n0 '+offsets.length+'\n0000000000 65535 f \n');
+  for (const offset of offsets.slice(1)) append(String(offset).padStart(10,'0')+' 00000 n \n');
+  append('trailer\n<< /Size '+offsets.length+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF\n');
+  return new Blob(parts,{type:'application/pdf'});
+}
+
+let sheetOptions;
+let sheetUrl;
+
+function clearSheetActions() {
+  get('sheet-actions').hidden = true;
+  get('sheet-download').hidden = false;
+  if (sheetUrl) URL.revokeObjectURL(sheetUrl);
+  sheetUrl = undefined;
+}
+function updateSheetInfo() {
+  const count = get('sheet-count').valueAsNumber;
+  const {perPage,templates} = sheetOptions;
+  const valid = Number.isInteger(count) && count >= 1 && count <= templates.length;
+  const pages = valid ? Math.ceil(count/perPage) : 0;
+  const estimate = pages === 1 ? '1 pàgina.' : pages+' pàgines.';
+  get('sheet-info').textContent = (valid ? estimate+' ' : '') + perPage+
+    ' problemes per pàgina com a màxim. Pots demanar fins a '+templates.length+' problemes sense repetir plantilla.';
+}
+get('worksheet').addEventListener('click',() => {
+  clearSheetActions();
+  get('sheet-close').textContent = 'Cancel·la';
+  sheetOptions = worksheetOptions();
+  get('sheet-count').max = sheetOptions.templates.length;
+  get('sheet-count').value = Math.min(sheetOptions.templates.length,sheetOptions.perPage*2);
+  get('sheet-error').hidden = true;
+  updateSheetInfo();
+  get('sheet-dialog').showModal();
+  get('sheet-count').focus();
+});
+get('sheet-count').addEventListener('input',() => {
+  clearSheetActions();
+  get('sheet-close').textContent = 'Cancel·la';
+  updateSheetInfo();
+});
+get('sheet-close').addEventListener('click',() => get('sheet-dialog').close());
+get('sheet-form').addEventListener('submit',async event => {
+  event.preventDefault();
+  const count = get('sheet-count').valueAsNumber;
+  const options = sheetOptions;
+  if (sheetUrl || get('sheet-download').disabled || !Number.isInteger(count) || count < 1 || count > options.templates.length) return;
+  clearSheetActions();
+  get('sheet-count').disabled = true;
+  get('sheet-download').disabled = true;
+  get('sheet-close').disabled = true;
+  get('sheet-error').hidden = true;
+  get('sheet-info').textContent = 'S’està preparant el PDF…';
+  try {
+    await Promise.race([
+      Promise.allSettled([document.fonts.load('400 15px "Comic Neue"'),document.fonts.load('700 15px "Comic Neue"')]),
+      new Promise(resolve => setTimeout(resolve,1500))
+    ]);
+    const problems = worksheetProblems(options,count);
+    const pages = Math.ceil(count/options.perPage);
+    const images = [];
+    for (let page = 0; page < pages; page++) {
+      const start = page*options.perPage;
+      images.push(await renderWorksheetPage(problems.slice(start,start+options.perPage),options,page,pages));
+    }
+    sheetUrl = URL.createObjectURL(makePdf(images));
+    get('sheet-open').href = sheetUrl;
+    get('sheet-save').href = sheetUrl;
+    get('sheet-download').hidden = true;
+    get('sheet-actions').hidden = false;
+    get('sheet-close').textContent = 'Tanca';
+    get('sheet-open').focus();
+  } catch {
+    get('sheet-error').textContent = 'No s’ha pogut generar el PDF. Torna-ho a provar.';
+    get('sheet-error').hidden = false;
+  } finally {
+    get('sheet-count').disabled = false;
+    get('sheet-download').disabled = false;
+    get('sheet-close').disabled = false;
+    updateSheetInfo();
+  }
+});
+get('sheet-dialog').addEventListener('cancel',event => {
+  if (get('sheet-download').disabled) event.preventDefault();
+});
+get('sheet-dialog').addEventListener('close',clearSheetActions);
+
+updateScoreboard();
+showProblem();
+</script>
+</body>
+</html>
